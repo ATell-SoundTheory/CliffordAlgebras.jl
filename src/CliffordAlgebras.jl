@@ -2,7 +2,7 @@ module CliffordAlgebras
 
 export CliffordAlgebra
 export order, signature, dimension, character
-export basesymbol, show 
+export basesymbol, show
 
 export MultiVector
 export zero, iszero, one, isone
@@ -13,7 +13,7 @@ export grin, dual, even, odd, conj
 export basevector, pseudoscalar
 export vector, matrix
 
-export +,-,*,/,\
+export +, -, *, /, \
 export ∧, ∨, ⋅, ⨼, ⨽, ⋆
 export ×₊, ×₋, ≀
 export inv, conj, adjoint

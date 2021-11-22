@@ -10,15 +10,15 @@ import Base.getproperty, Base.propertynames, Base.conj
 Type for a multivector belonging to the algebra CA<:CliffordAlgbra with vector coefficients of type T.
 Coefficients are stored using a sparse coding, and only the coefficients of the basis indices stored in the tuple BI are considered.
 """
-struct MultiVector{CA, T, BI, K}
+struct MultiVector{CA,T,BI,K}
     c::NTuple{K,T}
     function MultiVector(
-        CA::Type{<:CliffordAlgebra}, 
-        BI::NTuple{K,Integer}, 
-        c::NTuple{K,T}
+        CA::Type{<:CliffordAlgebra},
+        BI::NTuple{K,Integer},
+        c::NTuple{K,T},
     ) where {K,T<:Real}
-        @assert length(BI)>0 && issorted(BI) && allunique(BI)
-        new{CA,T,convert(NTuple{K,Int},BI),K}(c)
+        @assert length(BI) > 0 && issorted(BI) && allunique(BI)
+        new{CA,T,convert(NTuple{K,Int}, BI),K}(c)
     end
 end
 
@@ -28,8 +28,8 @@ end
 
 Creates a MultiVector from the real number a with only a scalar component. The internal storage type of the MultiVector is the type of a.
 """
-MultiVector(CA::Type{<:CliffordAlgebra}, a::T) where T<:Real = MultiVector(CA,(1,),(a,))
-MultiVector(ca::CliffordAlgebra, a::T) where T<:Real = MultiVector(typeof(ca),a)
+MultiVector(CA::Type{<:CliffordAlgebra}, a::T) where {T<:Real} = MultiVector(CA, (1,), (a,))
+MultiVector(ca::CliffordAlgebra, a::T) where {T<:Real} = MultiVector(typeof(ca), a)
 
 """
     MultiVector(::CliffordAlgebra, v::NTuple{N,T}) where {N,T<:Real}
@@ -37,25 +37,29 @@ MultiVector(ca::CliffordAlgebra, a::T) where T<:Real = MultiVector(typeof(ca),a)
 
 Creates a MultiVector by converting the provided vector v to a 1-vector. The internal storage type of the MultiVector is T.
 """
-function MultiVector(CA::Type{<:CliffordAlgebra}, v::NTuple{N,T} ) where {N,T<:Real}
+function MultiVector(CA::Type{<:CliffordAlgebra}, v::NTuple{N,T}) where {N,T<:Real}
     @assert N == order(CA) "Dimension count mismatch."
-    MultiVector(CA,Tuple(2:N+1),v)
+    MultiVector(CA, Tuple(2:N+1), v)
 end
 
-MultiVector(ca::CliffordAlgebra, v::NTuple{N,T}) where {N,T<:Real} = MultiVector(typeof(ca),v)
+MultiVector(ca::CliffordAlgebra, v::NTuple{N,T}) where {N,T<:Real} =
+    MultiVector(typeof(ca), v)
 
-zero(::Type{<:MultiVector{CA,T}}) where {CA,T} = MultiVector(CA,zero(T))
+zero(::Type{<:MultiVector{CA,T}}) where {CA,T} = MultiVector(CA, zero(T))
 zero(mv::MultiVector) = zero(typeof(mv))
 
-one(::Type{<:MultiVector{CA,T}}) where {CA,T} = MultiVector(CA,one(T))
+one(::Type{<:MultiVector{CA,T}}) where {CA,T} = MultiVector(CA, one(T))
 one(mv::MultiVector) = one(typeof(mv))
 
 iszero(mv::MultiVector) = all(iszero.(coefficients(mv)))
-isone(mv::MultiVector) = baseindices(mv)[1] == 1 && isone(coefficients(mv)[1]) && all(iszero.(coefficients(mv)[2:end]))
+isone(mv::MultiVector) =
+    baseindices(mv)[1] == 1 &&
+    isone(coefficients(mv)[1]) &&
+    all(iszero.(coefficients(mv)[2:end]))
 
-(==)(a::MultiVector,b::MultiVector) = false
+(==)(a::MultiVector, b::MultiVector) = false
 
-(==)(a::MultiVector{CA}, b::MultiVector{CA}) where CA = vector(a) == vector(b)
+(==)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = vector(a) == vector(b)
 
 """
     coefficients(::MultiVector)
@@ -71,7 +75,7 @@ coefficients(mv::MultiVector) = mv.c
 
 Returns the CliffordAlgebra to which the MultiVector belongs.
 """
-algebra(::Type{<:MultiVector{CA}}) where CA = CA
+algebra(::Type{<:MultiVector{CA}}) where {CA} = CA
 algebra(mv::MultiVector) = algebra(typeof(mv))
 
 
@@ -88,12 +92,13 @@ Returns the indices for the sparse MultiVector basis.
 baseindices(::Type{<:MultiVector{CA,T,BI}}) where {CA,T,BI} = BI
 baseindices(mv::MultiVector) = baseindices(typeof(mv))
 
-convert(T::Type{<:Real}, mv::MultiVector{CA,Tmv,(1,),1}) where {CA,Tmv} = convert(T, mv.c[1])
+convert(T::Type{<:Real}, mv::MultiVector{CA,Tmv,(1,),1}) where {CA,Tmv} =
+    convert(T, mv.c[1])
 
 function convert(T::Type{<:Real}, mv::MultiVector{CA,Tmv,BI}) where {CA,Tmv,BI}
     if BI[1] == 1
         if all(iszero.(mv.c[2:end]))
-            convert(T,mv.c[1])
+            convert(T, mv.c[1])
         else
             throw(InexactError(:convert, T, mv))
         end
@@ -126,9 +131,9 @@ end
 Returns a new MultiVector with all basis vectors removed from the sparse basis whose coefficients fall below the relative magnitude threshold.
 This function is not type stable, because the return type depends on the sparse basis.
 """
-function prune(mv::MultiVector ; rtol = 1e-8)
+function prune(mv::MultiVector; rtol = 1e-8)
     threshold = rtol * abs(maximum(coefficients(mv)))
-    selector = findall(c->abs(c)>threshold, coefficients(mv))
+    selector = findall(c -> abs(c) > threshold, coefficients(mv))
     if isempty(selector)
         zero(mv)
     else
@@ -147,13 +152,11 @@ function extend(mv::MultiVector)
     c = coefficients(mv)
     ca = algebra(mv)
     d = dimension(ca)
-    coeffs = Tuple( begin
-            k = findfirst(isequal(n),bi)
-            isnothing(k) ? zero(T) : c[k]
-        end 
-        for n in 1:d
-    )
-    MultiVector(ca,Tuple(1:d),coeffs)
+    coeffs = Tuple(begin
+        k = findfirst(isequal(n), bi)
+        isnothing(k) ? zero(T) : c[k]
+    end for n = 1:d)
+    MultiVector(ca, Tuple(1:d), coeffs)
 end
 
 
@@ -164,7 +167,7 @@ Projects the MultiVector onto the k-vectors.
 """
 function grade(mv::MultiVector, k::Integer)
     ca = algebra(mv)
-    selector = findall(isequal(k), map(i->basegrade(ca,i), baseindices(mv)))
+    selector = findall(isequal(k), map(i -> basegrade(ca, i), baseindices(mv)))
     if isempty(selector)
         zero(mv)
     else
@@ -179,7 +182,7 @@ Returns the even grade projection of the MultiVector.
 """
 function even(mv::MultiVector)
     ca = algebra(mv)
-    selector = findall(iseven, map(i->basegrade(ca,i), baseindices(mv)))
+    selector = findall(iseven, map(i -> basegrade(ca, i), baseindices(mv)))
     if isempty(selector)
         zero(mv)
     else
@@ -195,7 +198,7 @@ Returns the odd grade projection of the MultiVector.
 """
 function odd(mv::MultiVector)
     ca = algebra(mv)
-    selector = findall(isodd, map(i->basegrade(ca,i), baseindices(mv)))
+    selector = findall(isodd, map(i -> basegrade(ca, i), baseindices(mv)))
     if isempty(selector)
         zero(mv)
     else
@@ -213,9 +216,10 @@ grin(mv::MultiVector) = even(mv) - odd(mv)
 """
     dual(mv::MultiVector)
 
-Returns the Poincaré dual of the MultiVector, such that for all basis MultiVectors mv * dual(mv) = pseudoscalar. The dual is linear and the images of other MultiVectors follow from the images of the basis MultiVectors.
+Returns the Poincaré dual of the MultiVector, such that for all basis MultiVectors mv * dual(mv) = pseudoscalar. Dual is a linear map and the images of other MultiVectors follow from the images of the basis MultiVectors.
 """
-dual(mv::MultiVector{CA,T,BI,K}) where {CA,T,BI,K} = MultiVector(CA,dimension(CA)+1 .- BI[end:-1:1],coefficients(mv)[end:-1:1])
+dual(mv::MultiVector{CA,T,BI,K}) where {CA,T,BI,K} =
+    MultiVector(CA, dimension(CA) + 1 .- BI[end:-1:1], coefficients(mv)[end:-1:1])
 
 """
     reverse(::MultiVector)
@@ -226,8 +230,8 @@ function reverse(mv::MultiVector)
     # Reverses the order of the canonical basis products
     CA = algebra(mv)
     BI = baseindices(mv)
-    s = map( n->basereverse(CA,n), BI )
-    MultiVector(CA,BI,coefficients(mv).*s)
+    s = map(n -> basereverse(CA, n), BI)
+    MultiVector(CA, BI, coefficients(mv) .* s)
 end
 
 """
@@ -249,19 +253,19 @@ conj(mv::MultiVector) = reverse(grin(mv))
 
 function show(io::IO, m::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
     if all(iszero.(m.c))
-        println(io,0)
+        println(io, 0)
     else
-        for k in 1:K
+        for k = 1:K
             if !iszero(m.c[k])
-                bs = basesymbol(CA,BI[k])
+                bs = basesymbol(CA, BI[k])
                 if bs == Symbol(:𝟏)
-                    if m.c[k]<0
+                    if m.c[k] < 0
                         print(io, "-", -m.c[k])
                     else
                         print(io, "+", m.c[k])
                     end
                 else
-                    if m.c[k]<0
+                    if m.c[k] < 0
                         print(io, "-", -m.c[k], "×", bs)
                     else
                         print(io, "+", m.c[k], "×", bs)
@@ -269,7 +273,7 @@ function show(io::IO, m::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
                 end
             end
         end
-        println(io, " ∈ Cl",signature(CA))
+        println(io, " ∈ Cl", signature(CA))
     end
 end
 
@@ -280,8 +284,8 @@ end
 
 Returns the n-th basis MultiVector of the given CliffordAlgebra.
 """
-basevector(CA::Type{<:CliffordAlgebra}, n::Integer) = MultiVector(CA,(n,),(1,)) 
-basevector(ca::CliffordAlgebra, n::Integer) = basevector(typeof(ca),n)
+basevector(CA::Type{<:CliffordAlgebra}, n::Integer) = MultiVector(CA, (n,), (1,))
+basevector(ca::CliffordAlgebra, n::Integer) = basevector(typeof(ca), n)
 
 
 """
@@ -291,19 +295,19 @@ basevector(ca::CliffordAlgebra, n::Integer) = basevector(typeof(ca),n)
 Returns the basis MultiVector with the specified name from the given Clifford Algebra.
 """
 function basevector(CA::Type{<:CliffordAlgebra}, name::Symbol)
-    baseindex = findfirst(isequal(name), ntuple(k->basesymbol(CA,k),dimension(CA)))
+    baseindex = findfirst(isequal(name), ntuple(k -> basesymbol(CA, k), dimension(CA)))
     if isnothing(baseindex)
-        error("Algebra does not have a basis element ",name)
+        error("Algebra does not have a basis element ", name)
     end
-    basevector(CA,baseindex)
+    basevector(CA, baseindex)
 end
 
 basevector(ca::CliffordAlgebra, name::Symbol) = basevector(typeof(ca), name)
 
-propertynames(ca::CliffordAlgebra) = ntuple(i->basesymbol(ca,i),dimension(ca))
+propertynames(ca::CliffordAlgebra) = ntuple(i -> basesymbol(ca, i), dimension(ca))
 
 function getproperty(ca::CliffordAlgebra, name::Symbol)
-    basevector(ca,name)
+    basevector(ca, name)
 end
 
 
@@ -313,7 +317,7 @@ end
 
 Returns the pseudoscalar of the given algebra.
 """
-pseudoscalar(CA::Type{<:CliffordAlgebra}) = MultiVector(CA,(dimension(CA),),(1,))
+pseudoscalar(CA::Type{<:CliffordAlgebra}) = MultiVector(CA, (dimension(CA),), (1,))
 pseudoscalar(ca::CliffordAlgebra) = pseudoscalar(typeof(ca))
 
 """
@@ -321,13 +325,13 @@ pseudoscalar(ca::CliffordAlgebra) = pseudoscalar(typeof(ca))
 
 Returns the non-sparse vector representation of the MutliVector.
 """
-function vector(mv::MultiVector) 
+function vector(mv::MultiVector)
     ca = algebra(mv)
     d = dimension(ca)
     T = eltype(mv)
-    V = zeros(T,d)
+    V = zeros(T, d)
     V[collect(baseindices(mv))] .= coefficients(mv)
-    V 
+    V
 end
 
 
@@ -341,10 +345,10 @@ function matrix(mv::MultiVector)
     d = dimension(ca)
     mt = multtable(ca)
     T = eltype(mv)
-    M = zeros(T,d,d)
-    for (c,b) in zip(coefficients(mv),baseindices(mv))
-        for (bi,(bo,mc)) in enumerate(mt[b])
-            M[bo,bi] += c * mc
+    M = zeros(T, d, d)
+    for (c, b) in zip(coefficients(mv), baseindices(mv))
+        for (bi, (bo, mc)) in enumerate(mt[b])
+            M[bo, bi] += c * mc
         end
     end
     M
