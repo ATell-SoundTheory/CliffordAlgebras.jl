@@ -1,0 +1,13 @@
+name = "CliffordAlgebras"
+uuid = "ca841f6f-225c-4bbd-a467-7a3512dfa6f6"
+authors = ["Andreas Tell <atell@soundtheory.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
