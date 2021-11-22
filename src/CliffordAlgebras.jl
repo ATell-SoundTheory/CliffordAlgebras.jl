@@ -8,7 +8,7 @@ export MultiVector
 export zero, iszero, one, isone
 export ==, algebra, eltype
 export baseindices, coefficients
-export scalar, prune, grade
+export scalar, prune, extend, grade
 export grin, dual, even, odd, conj
 export basevector, pseudoscalar
 export vector, matrix

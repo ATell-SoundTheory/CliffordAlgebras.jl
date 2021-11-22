@@ -1,7 +1,7 @@
 # MultiVector arithmetic for CliffordAlgebras.jl
 
 import Base.+, Base.-, Base.*, Base./, Base.\
-import Base.inv, Base.adjoint, Base.exp, Base.conj
+import Base.inv, Base.adjoint, Base.exp
 import LinearAlgebra.norm
 import StaticArrays.SVector, StaticArrays.SMatrix
 
@@ -340,8 +340,8 @@ Calculates the MultiVector quotient a/b by evaluating a*inv(b).
 (/)(a::MultiVector{CA},b::Real) where CA = a * inv(b)
 
 """
-    b \ a
-    (\)(b::MultiVector{CA}, b::MuliVector{CA}) where CA
+    b \\ a
+    (\\)(b::MultiVector{CA}, b::MuliVector{CA}) where CA
 
 Calculates the MultiVector quotient a/b by evaluating inv(b)*a.
 """

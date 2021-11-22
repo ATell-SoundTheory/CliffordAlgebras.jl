@@ -1,9 +1,8 @@
 # MultiVector for CliffordAlgebras.jl
 
-import Printf.@printf
 import Base.zero, Base.one, Base.iszero, Base.isone
 import Base.==, Base.show, Base.eltype, Base.convert
-import Base.getproperty, Base.propertynames
+import Base.getproperty, Base.propertynames, Base.conj
 
 """
     MultiVector{CA,T,BI}
@@ -138,6 +137,27 @@ function prune(mv::MultiVector ; rtol = 1e-8)
 end
 
 """
+    extend(::MultiVector)
+
+Returns a new MultiVector with a non-sparse coefficient coding. This can be useful to manage type stability.
+"""
+function extend(mv::MultiVector)
+    bi = baseindices(mv)
+    T = eltype(mv)
+    c = coefficients(mv)
+    ca = algebra(mv)
+    d = dimension(ca)
+    coeffs = Tuple( begin
+            k = findfirst(isequal(n),bi)
+            isnothing(k) ? zero(T) : c[k]
+        end 
+        for n in 1:d
+    )
+    MultiVector(ca,Tuple(1:d),coeffs)
+end
+
+
+"""
     grade(::MultiVector, k::Integer)
 
 Projects the MultiVector onto the k-vectors.
@@ -228,21 +248,28 @@ conj(mv::MultiVector) = reverse(grin(mv))
 
 
 function show(io::IO, m::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
-    print(io, "MultiVector{",T,"} ∈ Cl",signature(CA)," : ")
     if all(iszero.(m.c))
         println(io,0)
     else
-        for k in 1:K 
+        for k in 1:K
             if !iszero(m.c[k])
                 bs = basesymbol(CA,BI[k])
                 if bs == Symbol(:𝟏)
-                    @printf(io,"%+f", m.c[k])
-                else 
-                    @printf(io,"%+f %s", m.c[k], bs)
+                    if m.c[k]<0
+                        print(io, "-", -m.c[k])
+                    else
+                        print(io, "+", m.c[k])
+                    end
+                else
+                    if m.c[k]<0
+                        print(io, "-", -m.c[k], "×", bs)
+                    else
+                        print(io, "+", m.c[k], "×", bs)
+                    end
                 end
             end
         end
-        println(io)
+        println(io, " ∈ Cl",signature(CA))
     end
 end
 
