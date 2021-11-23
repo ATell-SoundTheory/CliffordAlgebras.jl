@@ -14,7 +14,7 @@ import StaticArrays.SVector, StaticArrays.SMatrix
     bi_b = baseindices(b)
     acc_a[collect(bi_a)] = 1:length(bi_a)
     acc_b[collect(bi_b)] = 1:length(bi_b)
-    BI = Tuple(findall(@. !iszero(acc_a) || !iszero(acc_b)))
+    BI = Tuple(map( (a,b) -> !iszero(a) || !iszero(b), acc_a, acc_b))
     K = length(BI)
     T = promote_type(Ta, Tb)
     if iszero(K)
