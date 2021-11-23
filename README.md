@@ -8,6 +8,10 @@
 
 A fast, lightweight and easy to use Julia package for Clifford Algebras and Geometric Algebras.
 
+CliffordAlgebras.jl uses compile time code generation, sparse multivector representation and special case identification to handle arbitrary geometric algebras efficiently. Lazy evaluation is not yet supported.
+
+CliffordAlgebras provides a low level implementation that is common to all Clifford algebras. Functions that are specific to certain algebras can be added on top using the tools provided here.
+
 Generate a Clifford algebra:
 
 ```
