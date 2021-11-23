@@ -1,5 +1,10 @@
 ```@docs
 CliffordAlgebra
+CliffordAlgebra(::Integer)
+CliffordAlgebra(::Integer,::Integer)
+CliffordAlgebra(::Integer,::Ingeter,::Integer)
+CliffordAlgebra(::Integer,::Ingeter,::Integer,::Tuple)
+CliffordAlgebra(::Symbol)
 order
 signature
 dimension
@@ -7,6 +12,9 @@ character
 basesymbol
 
 MultiVector
+MultiVector(::Type,::Tuple,::Tuple)
+MultiVector(::Type,::Real)
+MultiVector(::Type,::Tuple)
 *
 /
 \

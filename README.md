@@ -198,4 +198,10 @@ julia> matrix(mv1)
  2.0   1.0  1.0   0.0
  0.0  -1.0  1.0   2.0
  1.0   0.0  2.0   1.0  
+
+julia> matrix(mv1)*matrix(mv2) == matrix(mv1*mv2)
+true
+
+julia> matrix(mv2)*vector(mv1) == vector(mv2*mv1)
+true
 ```
