@@ -1,3 +1,8 @@
 using Documenter, CliffordAlgebras
 
-makedocs(sizename="CliffordAlgebras.jl Documentation")
+makedocs(sitename = "CliffordAlgebras.jl Documentation")
+
+deploydocs(
+    repo = "github.com/ATell-SoundTheory/CliffordAlgebras.jl.git",
+    versions = nothing,
+)
