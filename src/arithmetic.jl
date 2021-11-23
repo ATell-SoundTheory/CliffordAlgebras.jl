@@ -529,3 +529,37 @@ function exp_fallback2(mv::MultiVector; order::Integer = 16)
 end
 
 
+"""
+    outermorphism(A::AbstractMatrix, mv::MultiVector)
+
+Calculates the outermorphism f of the MultiVector defined by f(v) = Av if v is in the grade-1 subspace of the algebra.
+"""
+@generated function outermorphism(A::AbstractMatrix, mv::MultiVector)
+    ca = algebra(mv)
+    bi = baseindices(mv)
+    bt = basetable(ca)
+    bv = reduce(union, bt[collect(bi)])
+    if isempty(bv)
+        return :(mv)
+    else 
+        nb = Expr(:call,:tuple)
+        append!(nb.args, [:(MultiVector(ca, Tuple(A[:,$(bv[i])]))) for i = 1:length(bv)])
+        s = Expr(:call,:+)
+        for (k,b) in enumerate(bt[collect(bi)])
+            ft = map(n -> findfirst(isequal(n), bv) ,b)
+            if isempty(ft)
+                push!(s.args, :(mv.c[$k]))
+            elseif length(ft) == 1
+                push!(s.args, :(mv.c[$k] * f[$(ft[1])]))
+            else
+                bp = foldl((a,b) -> Expr(:call, :∧, a, b), map(n->:(f[$n]), ft))
+                push!(s.args, :(mv.c[$k] * $bp))
+            end
+        end
+        quote
+            ca = algebra(mv)
+            f = $nb
+            $s
+        end
+    end
+end

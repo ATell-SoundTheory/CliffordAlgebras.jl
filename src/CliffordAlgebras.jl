@@ -19,7 +19,7 @@ export ∧, ∨, ⋅, ⨼, ⨽, ⋆
 export ×₊, ×₋, ≀
 export inv, adjoint
 export polarize, norm, norm_sqr
-export Λᵏ, exp
+export Λᵏ, exp, outermorphism
 
 include("utils.jl")
 include("algebra.jl")
