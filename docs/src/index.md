@@ -20,7 +20,6 @@ MultiVector
 ×₋
 ≀
 inv
-adjoint
 polarize
 norm
 norm_sqr
