@@ -3,6 +3,7 @@
 import Base.zero, Base.one, Base.iszero, Base.isone
 import Base.==, Base.show, Base.eltype, Base.convert
 import Base.getproperty, Base.propertynames, Base.conj
+import Base.reverse, Base.~
 
 """
     MultiVector{CA,T,BI}

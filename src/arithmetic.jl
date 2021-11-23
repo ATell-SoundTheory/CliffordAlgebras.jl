@@ -2,7 +2,7 @@
 
 import Base.+, Base.-, Base.*, Base./, Base.\
 import Base.inv, Base.adjoint, Base.exp
-import LinearAlgebra.norm
+import LinearAlgebra.norm, LinearAlgebra.norm_sqr
 import StaticArrays.SVector, StaticArrays.SMatrix
 
 
@@ -14,7 +14,7 @@ import StaticArrays.SVector, StaticArrays.SMatrix
     bi_b = baseindices(b)
     acc_a[collect(bi_a)] = 1:length(bi_a)
     acc_b[collect(bi_b)] = 1:length(bi_b)
-    BI = Tuple(findall(@. !iszero(acc_a) || !iszero(acc_b)))
+    BI = Tuple(findall(map( (a,b) -> !iszero(a) || !iszero(b), acc_a, acc_b)))
     K = length(BI)
     T = promote_type(Ta, Tb)
     if iszero(K)
@@ -80,6 +80,11 @@ scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
     :(MultiVector(algebra(a), $BI, $coeffsexpr))
 end
 
+"""
+    a * b
+
+Calculates the geometric product of two MultiVectors a and b.
+"""
 (*)(a::MultiVector, b::MultiVector) where {CA} = filteredprod(a, b, Val(geometricfilter))
 (*)(a::Real, b::MultiVector) = MultiVector(algebra(b), baseindices(b), a .* coefficients(b))
 (*)(a::MultiVector, b::Real) = b * a
@@ -285,9 +290,17 @@ end
 """
     norm(::MultiVector)
 
-Calculates the MultiVector norm defined as grade(mv*reverse(mv),0)
+Calculates the MultiVector norm defined as sqrt(grade(mv*reverse(mv),0))
 """
-norm(mv::MultiVector) = scalar(Λᵏ(mv * reverse(mv), 0))
+norm(mv::MultiVector) = sqrt(scalar(Λᵏ(mv * reverse(mv), 0)))
+
+"""
+    norm_sqr(::MultiVector)
+
+Calculates the MultiVector squared norm defined as grade(mv*reverse(mv),0)
+"""
+norm_sqr(mv::MultiVector) = scalar(Λᵏ(mv * reverse(mv), 0))
+
 
 """
     inv(::MultiVector)
