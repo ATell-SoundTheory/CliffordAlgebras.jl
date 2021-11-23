@@ -8,16 +8,17 @@ export MultiVector
 export zero, iszero, one, isone
 export ==, algebra, eltype
 export baseindices, coefficients
-export scalar, prune, extend, grade
-export grin, dual, even, odd, conj
+export scalar, prune, extend
+export grade, reverse, ~, conj
+export grin, dual, even, odd
 export basevector, pseudoscalar
 export vector, matrix
 
 export +, -, *, /, \
 export ∧, ∨, ⋅, ⨼, ⨽, ⋆
 export ×₊, ×₋, ≀
-export inv, conj, adjoint
-export polarize, norm
+export inv, adjoint
+export polarize, norm, norm_sqr
 export Λᵏ, exp
 
 include("utils.jl")
