@@ -1,54 +1,15 @@
-```@docs
-CliffordAlgebra
-CliffordAlgebra(::Integer)
-CliffordAlgebra(::Integer,::Integer)
-CliffordAlgebra(::Integer,::Integer,::Integer)
-CliffordAlgebra(::Integer,::Integer,::Integer,::Tuple)
-CliffordAlgebra(::Symbol)
-order
-signature
-dimension
-character
-basesymbol
+Exported symbols from `CliffordAlgebras.jl`:
 
-MultiVector
-MultiVector(::Type,::Tuple,::Tuple)
-MultiVector(::Type,::Real)
-MultiVector(::Type,::Tuple)
-*
-/
-\
-∧
-∨
-⋅
-⨼
-⨽
-⋆
-×₊
-×₋
-≀
-inv
-polarize
-norm
-norm_sqr
-exp
-algebra
-baseindices
-coefficients
-scalar
-grade
-Λᵏ
-reverse
-conj
-grin
-dual
-even
-odd
-basevector
-pseudoscalar
-prune
-extend
-vector
-matrix
-``` 
+```@autodocs
+Modules = [CliffordAlgebras]
+Private = false
+Order = [:function,:type]
+```
 
+Private symbols:
+
+```@autodocs
+Modules = [CliffordAlgebras]
+Public = false
+Order = [:function,:type,:constant,:macro]
+```
