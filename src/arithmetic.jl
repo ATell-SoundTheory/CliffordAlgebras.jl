@@ -80,6 +80,11 @@ scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
     :(MultiVector(algebra(a), $BI, $coeffsexpr))
 end
 
+"""
+    a * b
+
+Calculates the geometric product of two MultiVectors a and b.
+"""
 (*)(a::MultiVector, b::MultiVector) where {CA} = filteredprod(a, b, Val(geometricfilter))
 (*)(a::Real, b::MultiVector) = MultiVector(algebra(b), baseindices(b), a .* coefficients(b))
 (*)(a::MultiVector, b::Real) = b * a
