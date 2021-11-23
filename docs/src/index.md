@@ -2,8 +2,8 @@
 CliffordAlgebra
 CliffordAlgebra(::Integer)
 CliffordAlgebra(::Integer,::Integer)
-CliffordAlgebra(::Integer,::Ingeter,::Integer)
-CliffordAlgebra(::Integer,::Ingeter,::Integer,::Tuple)
+CliffordAlgebra(::Integer,::Integer,::Integer)
+CliffordAlgebra(::Integer,::Integer,::Integer,::Tuple)
 CliffordAlgebra(::Symbol)
 order
 signature
