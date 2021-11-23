@@ -10,6 +10,7 @@ PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
+StaticArrays = "1"
 Combinatorics = "1"
 PrettyTables = "1"
 julia = "1.6"
