@@ -1,6 +1,5 @@
-[![Runtests](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Runtests.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Runtests.yml)
-
-[![Documenter](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Documenter.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Documenter.yml)
+[![Tests](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Runtests.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Runtests.yml)
+[![Documentation](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Documenter.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Documenter.yml)
 
 # CliffordAlgebras
 
