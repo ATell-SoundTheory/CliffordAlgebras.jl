@@ -21,8 +21,8 @@ import StaticArrays.SVector, StaticArrays.SMatrix
         return :(MultiVector(algebra(a), zero($T)))
     end
     coeffs = (
-        iszero(acc_a[n]) ? :(b.c[$(acc_b[n])]) :
-        iszero(acc_b[n]) ? :(a.c[$(acc_a[n])]) : :(a.c[$(acc_a[n])] + b.c[$(acc_b[n])]) for
+        iszero(acc_a[n]) ? :(coefficients(b)[$(acc_b[n])]) :
+        iszero(acc_b[n]) ? :(coefficients(a)[$(acc_a[n])]) : :(coefficients(a)[$(acc_a[n])] + coefficients(b)[$(acc_b[n])]) for
         n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
@@ -73,7 +73,7 @@ scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
         Expr(
             :call,
             :+,
-            (:($(tup[3]) * a.c[$(tup[1])] * b.c[$(tup[2])]) for tup in acc[n])...,
+            (:($(tup[3]) * coefficients(a)[$(tup[1])] * coefficients(b)[$(tup[2])]) for tup in acc[n])...,
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
@@ -171,7 +171,7 @@ Calculates the vee product of the MultiVectors a and b.
         Expr(
             :call,
             :+,
-            (:($(tup[3]) * a.c[$(tup[1])] * b.c[$(tup[2])]) for tup in acc[n])...,
+            (:($(tup[3]) * coefficients(a)[$(tup[1])] * coefficients(b)[$(tup[2])]) for tup in acc[n])...,
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
@@ -232,7 +232,7 @@ Calculates the anti-commutator ab+ba of two MultiVectors a and b.
             :call,
             :+,
             (
-                :($(tup[4]) * a.c[$(tup[1])] * b.c[$(tup[2])] * a.c[$(tup[3])]) for
+                :($(tup[4]) * coefficients(a)[$(tup[1])] * coefficients(b)[$(tup[2])] * coefficients(a)[$(tup[3])]) for
                 tup in acc[n]
             )...,
         ) for n in BI
@@ -277,7 +277,7 @@ Projects the MultiVector onto k-vectors. Similar to grade(mv,k), but uses
     BI = baseindices(mv)[s]
     K = length(BI)
     T = eltype(mv)
-    coeffs = (:(mv.c[$i]) for i in s)
+    coeffs = (:(coefficients(mv)[$i]) for i in s)
     if length(coeffs) == 0
         return :(MultiVector(algebra(a), zero($T)))
     end
@@ -387,7 +387,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
         rc = basereverse(CA, BI[i2])
         push!(
             coeffexpr[findfirst(isequal(bres), BIsa)].args,
-            :($(c * rc) * mv.c[$i1] * mv.c[$i2]),
+            :($(c * rc) * coefficients(mv)[$i1] * coefficients(mv)[$i2]),
         )
     end
     K = length(BIsa)
@@ -456,7 +456,7 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
             push!(prodexpr.args, :(exp(scalar(mv))))
         else
             baseselector = Tuple([findfirst(isequal(i), bi) for i in ncset])
-            coeftuple = Expr(:call, :tuple, map(i -> :(mv.c[$i]), baseselector)...)
+            coeftuple = Expr(:call, :tuple, map(i -> :(coefficients(mv)[$i]), baseselector)...)
             ncsetmvexpr = :(MultiVector(algebra(mv), $(Tuple(ncset)), $coeftuple))
             basesquares = [mt[i][i][2] for i in ncset]
             crosstermscancel =
@@ -548,15 +548,16 @@ Calculates the outermorphism f of the MultiVector defined by f(v) = Av if v is i
         for (k,b) in enumerate(bt[collect(bi)])
             ft = map(n -> findfirst(isequal(n), bv) ,b)
             if isempty(ft)
-                push!(s.args, :(mv.c[$k]))
+                push!(s.args, :(coefficients(mv)[$k]))
             elseif length(ft) == 1
-                push!(s.args, :(mv.c[$k] * f[$(ft[1])]))
+                push!(s.args, :(coefficients(mv)[$k] * f[$(ft[1])]))
             else
                 bp = foldl((a,b) -> Expr(:call, :∧, a, b), map(n->:(f[$n]), ft))
-                push!(s.args, :(mv.c[$k] * $bp))
+                push!(s.args, :(coefficients(mv)[$k] * $bp))
             end
         end
         quote
+            @assert size(A,1) == size(A,2) == $(order(ca)) "The matrix A must be N×N where N is the order of the algebra."
             ca = algebra(mv)
             f = $nb
             $s

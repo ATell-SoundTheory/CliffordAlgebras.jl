@@ -67,7 +67,7 @@ isone(mv::MultiVector) =
 
 Returns the sparse coefficients of the MultiVector.
 """
-coefficients(mv::MultiVector) = mv.c
+coefficients(mv::MultiVector) = getfield(mv,:c)
 
 
 """
@@ -94,17 +94,17 @@ baseindices(::Type{<:MultiVector{CA,T,BI}}) where {CA,T,BI} = BI
 baseindices(mv::MultiVector) = baseindices(typeof(mv))
 
 convert(T::Type{<:Real}, mv::MultiVector{CA,Tmv,(1,),1}) where {CA,Tmv} =
-    convert(T, mv.c[1])
+    convert(T, coefficients(mv)[1])
 
 function convert(T::Type{<:Real}, mv::MultiVector{CA,Tmv,BI}) where {CA,Tmv,BI}
     if BI[1] == 1
-        if all(iszero.(mv.c[2:end]))
-            convert(T, mv.c[1])
+        if all(iszero.(coefficients(mv)[2:end]))
+            convert(T, coefficients(mv)[1])
         else
             throw(InexactError(:convert, T, mv))
         end
     else
-        if all(iszero.(mv.c))
+        if all(iszero.(coefficients(mv)))
             zero(T)
         else
             throw(InexactError(:convert, T, mv))
@@ -119,7 +119,7 @@ Returns the scalar component of the multivector. The result if of the internal s
 """
 function scalar(mv::MultiVector{CA,T,BI}) where {CA,T,BI}
     if BI[1] == 1
-        mv.c[1]
+        coefficients(mv)[1]
     else
         zero(T)
     end
@@ -175,6 +175,18 @@ function grade(mv::MultiVector, k::Integer)
         MultiVector(algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
     end
 end
+
+
+"""
+    isgrade(::MultiVector, k::Integer)
+
+Returns true if the MultiVector is of grade k, false if not.
+"""
+function isgrade(mv::MultiVector, k::Integer)
+    ca = algebra(mv)
+    all(basegrade(ca,i) == k || iszero(coefficients(mv)[n]) for (n,i) in enumerate(baseindices(mv)))
+end
+
 
 """
     even(::MultiVector)
@@ -252,30 +264,35 @@ Return the conjugate of the MultiVector, i.e. reverse(grin(mv)).
 conj(mv::MultiVector) = reverse(grin(mv))
 
 
-function show(io::IO, m::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
-    if all(iszero.(m.c))
-        println(io, 0)
+function show_multivector(io::IO, m::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
+    if all(iszero.(coefficients(m)))
+        print(io, 0)
     else
         for k = 1:K
-            if !iszero(m.c[k])
+            if !iszero(coefficients(m)[k])
                 bs = basesymbol(CA, BI[k])
                 if bs == Symbol(:𝟏)
-                    if m.c[k] < 0
-                        print(io, "-", -m.c[k])
+                    if coefficients(m)[k] < 0
+                        print(io, "-", -coefficients(m)[k])
                     else
-                        print(io, "+", m.c[k])
+                        print(io, "+", coefficients(m)[k])
                     end
                 else
-                    if m.c[k] < 0
-                        print(io, "-", -m.c[k], "×", bs)
+                    if coefficients(m)[k] < 0
+                        print(io, "-", -coefficients(m)[k], "×", bs)
                     else
-                        print(io, "+", m.c[k], "×", bs)
+                        print(io, "+", coefficients(m)[k], "×", bs)
                     end
                 end
             end
         end
-        println(io, " ∈ Cl", signature(CA))
+        print(io, " ∈ Cl", signature(CA))
     end
+end
+
+
+function show(io::IO, m::MultiVector)
+    show_multivector(io, m)
 end
 
 
@@ -306,9 +323,26 @@ end
 basevector(ca::CliffordAlgebra, name::Symbol) = basevector(typeof(ca), name)
 
 propertynames(ca::CliffordAlgebra) = ntuple(i -> basesymbol(ca, i), dimension(ca))
+propertynames(mv::MultiVector) = propertynames(algebra(mv))
+
 
 function getproperty(ca::CliffordAlgebra, name::Symbol)
     basevector(ca, name)
+end
+
+
+function getproperty(mv::MultiVector, name::Symbol)
+    ca = algebra(mv)
+    baseindex = findfirst(isequal(name), ntuple(k -> basesymbol(ca, k), dimension(ca)))
+    if isnothing(baseindex)
+        error("Algebra does not have a basis element ", name)
+    end
+    storageindex = findfirst(isequal(baseindex), baseindices(mv))
+    if isnothing(storageindex)
+        return zero(eltype(mv))
+    else
+        return coefficients(mv)[storageindex]
+    end
 end
 
 

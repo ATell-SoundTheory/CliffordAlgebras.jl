@@ -2,5 +2,14 @@ using CliffordAlgebras
 using Test
 
 @testset "CliffordAlgebras.jl" begin
-    # Write your tests here.
+
+    @testset "Algebra" begin
+    end
+
+    @testset "MultiVector" begin
+    end
+
+    @testset "arithmetic" begin
+    end
+    
 end

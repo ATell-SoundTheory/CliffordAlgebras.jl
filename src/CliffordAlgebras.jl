@@ -2,15 +2,15 @@ module CliffordAlgebras
 
 export CliffordAlgebra
 export order, signature, dimension, character
-export basesymbol, show
+export basesymbol, show, show_multivector
 
 export MultiVector
 export zero, iszero, one, isone
 export ==, algebra, eltype
 export baseindices, coefficients
 export scalar, prune, extend
-export grade, reverse, ~, conj
-export grin, dual, even, odd
+export grade, isgrade, reverse, ~
+export conj, grin, dual, even, odd
 export basevector, pseudoscalar
 export vector, matrix
 
