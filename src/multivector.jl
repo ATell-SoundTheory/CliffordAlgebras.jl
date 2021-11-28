@@ -18,7 +18,8 @@ struct MultiVector{CA,T,BI,K}
         BI::NTuple{K,Integer},
         c::NTuple{K,T},
     ) where {K,T<:Real}
-        @assert length(BI) > 0 && issorted(BI) && allunique(BI)
+        @assert length(BI) > 0 
+        #@assert issorted(BI) && allunique(BI)
         new{CA,T,convert(NTuple{K,Int}, BI),K}(c)
     end
 end
@@ -74,10 +75,20 @@ coefficients(mv::MultiVector) = getfield(mv,:c)
     algebra(::MultiVector)
     algebra(::Type{<:MultiVector})
 
-Returns the CliffordAlgebra to which the MultiVector belongs.
+Returns the CliffordAlgebra instance to which the MultiVector belongs.
 """
-algebra(::Type{<:MultiVector{CA}}) where {CA} = CA
+algebra(::Type{<:MultiVector{CA}}) where {CA} = CA.instance
 algebra(mv::MultiVector) = algebra(typeof(mv))
+
+
+"""
+    Algebra(::MultiVector)
+    Algebra(::Type{<:MultiVector})
+
+Returns the CliffordAlgebra type to which the MultiVector belongs.
+"""
+Algebra(::Type{<:MultiVector{CA}}) where {CA} = CA
+Algebra(mv::MultiVector) = Algebra(typeof(mv))
 
 
 eltype(::Type{<:MultiVector{CA,T}}) where {CA,T} = T
@@ -138,7 +149,7 @@ function prune(mv::MultiVector; rtol = 1e-8)
     if isempty(selector)
         zero(mv)
     else
-        MultiVector(algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
+        MultiVector(Algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
     end
 end
 
@@ -147,17 +158,22 @@ end
 
 Returns a new MultiVector with a non-sparse coefficient coding. This can be useful to manage type stability.
 """
-function extend(mv::MultiVector)
+@generated function extend(mv::MultiVector{CA}) where CA
     bi = baseindices(mv)
+    d = dimension(CA)
     T = eltype(mv)
-    c = coefficients(mv)
-    ca = algebra(mv)
-    d = dimension(ca)
-    coeffs = Tuple(begin
-        k = findfirst(isequal(n), bi)
-        isnothing(k) ? zero(T) : c[k]
-    end for n = 1:d)
-    MultiVector(ca, Tuple(1:d), coeffs)
+    bexpr = Expr(:call,:tuple)
+    cexpr = Expr(:call,:tuple)
+    for k = 1:d
+        push!(bexpr.args, k)
+        n = findfirst(isequal(k), bi)
+        if isnothing(n)
+            push!(cexpr.args, :(zero($T)))
+        else
+            push!(cexpr.args, :(coefficients(mv)[$n]))
+        end
+    end
+    :(@inbounds MultiVector(CA, $bexpr, $cexpr))
 end
 
 
@@ -172,7 +188,7 @@ function grade(mv::MultiVector, k::Integer)
     if isempty(selector)
         zero(mv)
     else
-        MultiVector(algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
+        MultiVector(Algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
     end
 end
 
@@ -199,7 +215,7 @@ function even(mv::MultiVector)
     if isempty(selector)
         zero(mv)
     else
-        MultiVector(algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
+        MultiVector(Algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
     end
 end
 
@@ -215,7 +231,7 @@ function odd(mv::MultiVector)
     if isempty(selector)
         zero(mv)
     else
-        MultiVector(algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
+        MultiVector(Algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
     end
 end
 

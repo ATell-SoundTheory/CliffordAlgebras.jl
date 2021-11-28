@@ -18,7 +18,7 @@ import StaticArrays.SVector, StaticArrays.SMatrix
     K = length(BI)
     T = promote_type(Ta, Tb)
     if iszero(K)
-        return :(MultiVector(algebra(a), zero($T)))
+        return :(MultiVector(Algebra(a), zero($T)))
     end
     coeffs = (
         iszero(acc_a[n]) ? :(coefficients(b)[$(acc_b[n])]) :
@@ -26,7 +26,7 @@ import StaticArrays.SVector, StaticArrays.SMatrix
         n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(MultiVector(algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
 end
 
 (+)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA, a) + b
@@ -38,19 +38,9 @@ end
 (-)(a::MultiVector, b::Real) = a + (-b)
 
 
-geometricfilter(leftgrade, rightgrade, productgrade) = true
-exteriorfilter(leftgrade, rightgrade, productgrade) = productgrade == leftgrade + rightgrade
-leftcontractionfilter(leftgrade, rightgrade, productgrade) =
-    productgrade == rightgrade - leftgrade
-rightcontractionfilter(leftgrade, rightgrade, productgrade) =
-    productgrade == leftgrade - rightgrade
-fatdotfilter(leftgrade, rightgrade, productgrade) =
-    productgrade == abs(leftgrade - rightgrade)
-scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
-
-@generated function filteredprod(
-    a::MultiVector{CA,Ta},
-    b::MultiVector{CA,Tb},
+function generatefilteredprod(
+    a::Type{<:MultiVector{CA,Ta}},
+    b::Type{<:MultiVector{CA,Tb}},
     ::Val{Filter},
 ) where {CA,Ta,Tb,Filter}
     d = dimension(CA)
@@ -58,8 +48,25 @@ scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
     acc = [NTuple{3,Int}[] for n = 1:d]
     for (ka, base_a) in enumerate(baseindices(a)), (kb, base_b) in enumerate(baseindices(b))
         baseidx, coeff = mt[base_a][base_b]
-        if !iszero(coeff) &&
-           Filter(basegrade(CA, base_a), basegrade(CA, base_b), basegrade(CA, baseidx))
+        leftgrade = basegrade(CA, base_a)
+        rightgrade = basegrade(CA, base_b)
+        productgrade = basegrade(CA, baseidx)
+        keep = if Filter == :geometric
+            true
+        elseif Filter == :exterior
+            productgrade == leftgrade + rightgrade
+        elseif Filter == :rightcontraction
+            productgrade == leftgrade - rightgrade
+        elseif Filter == :leftcontraction
+            productgrade == rightgrade - leftgrade
+        elseif Filter == :fatdot
+            productgrade == abs(leftgrade - rightgrade)
+        elseif Filter == :scalar
+            iszero(productgrade)
+        else
+            error("unknown filter.")
+        end
+        if !iszero(coeff) && keep
             push!(acc[baseidx], (ka, kb, coeff))
         end
     end
@@ -67,7 +74,7 @@ scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
     K = length(BI)
     T = promote_type(Ta, Tb)
     if iszero(K)
-        return :(MultiVector(algebra(a), zero($T)))
+        return :(MultiVector(Algebra(a), zero($T)))
     end
     coeffs = (
         Expr(
@@ -77,16 +84,59 @@ scalarfilter(leftgrade, rightgrade, productgrade) = iszero(productgrade)
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(MultiVector(algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
 end
+
+@generated function geometricprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb},
+) where {CA,Ta,Tb}
+    generatefilteredprod(a,b,Val(:geometric))
+end
+
+@generated function exteriorprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb},
+) where {CA,Ta,Tb}
+    generatefilteredprod(a,b,Val(:exterior))
+end
+
+@generated function leftcontractionprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb},
+) where {CA,Ta,Tb}
+    generatefilteredprod(a,b,Val(:leftcontraction))
+end
+
+@generated function rightcontractionprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb},
+) where {CA,Ta,Tb}
+    generatefilteredprod(a,b,Val(:rightcontraction))
+end
+
+@generated function fatdotprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb},
+) where {CA,Ta,Tb}
+    generatefilteredprod(a,b,Val(:fatdot))
+end
+
+@generated function scalarprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb},
+) where {CA,Ta,Tb}
+    generatefilteredprod(a,b,Val(:scalar))
+end
+
 
 """
     a * b
 
 Calculates the geometric product of two MultiVectors a and b.
 """
-(*)(a::MultiVector, b::MultiVector) where {CA} = filteredprod(a, b, Val(geometricfilter))
-(*)(a::Real, b::MultiVector) = MultiVector(algebra(b), baseindices(b), a .* coefficients(b))
+(*)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = geometricprod(a, b)
+(*)(a::Real, b::MultiVector) = MultiVector(Algebra(b), baseindices(b), a .* coefficients(b))
 (*)(a::MultiVector, b::Real) = b * a
 
 """
@@ -95,7 +145,7 @@ Calculates the geometric product of two MultiVectors a and b.
 Calculates the wedge product between two MultiVectors a and b.
 """
 (∧)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    filteredprod(a, b, Val(exteriorfilter))
+    exteriorprod(a, b)
 
 """
     a ⋅ b
@@ -103,7 +153,7 @@ Calculates the wedge product between two MultiVectors a and b.
 Calculates the "fat dot" product between the MultiVectors a and b.
 """
 (⋅)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    filteredprod(a, b, Val(fatdotfilter))
+    fatdotprod(a, b)
 
 """
     a ⨼ b
@@ -111,7 +161,7 @@ Calculates the "fat dot" product between the MultiVectors a and b.
 Calculates the left contraction of the MultiVectors a and b.
 """
 (⨼)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    filteredprod(a, b, Val(leftcontractionfilter))
+    leftcontractionprod(a, b)
 
 """
     a ⨽ b
@@ -119,7 +169,7 @@ Calculates the left contraction of the MultiVectors a and b.
 Calculates the right contraction of the MultiVectors a and b.
 """
 (⨽)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    filteredprod(a, b, Val(rightcontractionfilter))
+    rightcontractionprod(a, b)
 
 """
     a ⋆ b
@@ -127,7 +177,7 @@ Calculates the right contraction of the MultiVectors a and b.
 Calculates the scalar product of the MultiVectors a and b.
 """
 (⋆)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    filteredprod(a, b, Val(scalarfilter))
+    scalarprod(a, b)
 
 """
     a ∨ b
@@ -136,10 +186,10 @@ Calculates the vee product of the MultiVectors a and b.
 """
 (∨)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = dual(dual(a) ∧ dual(b))
 
-@generated function symprod(
-    a::MultiVector{CA,Ta},
-    b::MultiVector{CA,Tb},
-    ::Val{P},
+function generatesymprod(
+    a::Type{<:MultiVector{CA,Ta}},
+    b::Type{<:MultiVector{CA,Tb}},
+    ::Val{P}
 ) where {CA,Ta,Tb,P}
     d = dimension(CA)
     mt = multtable(CA)
@@ -165,7 +215,7 @@ Calculates the vee product of the MultiVectors a and b.
     K = length(BI)
     T = promote_type(Ta, Tb)
     if iszero(K)
-        return :(MultiVector(algebra(a), zero($T)))
+        return :(MultiVector(Algebra(a), zero($T)))
     end
     coeffs = (
         Expr(
@@ -175,8 +225,26 @@ Calculates the vee product of the MultiVectors a and b.
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(MultiVector(algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
 end
+
+
+@generated function commutatorprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb}
+) where {CA,Ta,Tb}
+    generatesymprod(a, b, Val(-1))
+end
+
+@generated function anticommutatorprod(
+    a::MultiVector{CA,Ta},
+    b::MultiVector{CA,Tb}
+) where {CA,Ta,Tb}
+    generatesymprod(a, b, Val(+1))
+end
+
+
+
 
 """
     a ×₋ b
@@ -184,7 +252,7 @@ end
 Calculates the commutator ab-ba of two MultiVectors a and b.
 """
 (×₋)(a::MultiVector{CA,Ta}, b::MultiVector{CA,Tb}) where {CA,Ta,Tb} =
-    inv(promote_type(Ta, Tb)(2)) * symprod(a, b, Val(-1))
+    inv(promote_type(Ta, Tb)(2)) * commutatorprod(a, b)
 
 (×₋)(a::Ta, b::MultiVector{CA,Tb}) where {CA,Ta<:Real,Tb} = zero(promote_type(Ta, Tb))
 (×₋)(a::MultiVector, b::Real) = b ×₋ a
@@ -196,7 +264,7 @@ Calculates the commutator ab-ba of two MultiVectors a and b.
 Calculates the anti-commutator ab+ba of two MultiVectors a and b.
 """
 (×₊)(a::MultiVector{CA,Ta}, b::MultiVector{CA,Tb}) where {CA,Ta,Tb} =
-    inv(promote_type(Ta, Tb)(2)) * symprod(a, b, Val(+1))
+    inv(promote_type(Ta, Tb)(2)) * anticommutatorprod(a, b)
 (×₊)(a::Real, b::MultiVector) = a * b
 (×₊)(a::MultiVector, b::Real) = a * b
 (×₊)(a::Real, b::Real) = a * b
@@ -225,7 +293,7 @@ Calculates the anti-commutator ab+ba of two MultiVectors a and b.
     K = length(BI)
     T = promote_type(Ta, Tb)
     if iszero(K)
-        return :(MultiVector(algebra(a), zero($T)))
+        return :(MultiVector(Algebra(a), zero($T)))
     end
     coeffs = (
         Expr(
@@ -238,7 +306,7 @@ Calculates the anti-commutator ab+ba of two MultiVectors a and b.
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(MultiVector(algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
 end
 
 """
@@ -279,10 +347,10 @@ Projects the MultiVector onto k-vectors. Similar to grade(mv,k), but uses
     T = eltype(mv)
     coeffs = (:(coefficients(mv)[$i]) for i in s)
     if length(coeffs) == 0
-        return :(MultiVector(algebra(a), zero($T)))
+        return :(MultiVector(Algebra(a), zero($T)))
     end
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(MultiVector(algebra(mv), $BI, $coeffsexpr))
+    :(@inbounds MultiVector(Algebra(mv), $BI, $coeffsexpr))
 end
 
 (Λᵏ)(mv::MultiVector, k::Integer) = Λᵏ(mv, Val(k))
@@ -338,7 +406,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
             if iszero(c)
                 throw(SingularException)
             end
-            MultiVector(algebra(mv), $BI, ($rc * inv(c),))
+            MultiVector(Algebra(mv), $BI, ($rc * inv(c),))
         end
     end
     if all(isone, reversesigns) || all(s -> isone(-s), reversesigns)
@@ -369,7 +437,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
             c = coefficients(mv)
             cinv = $ma \ $id
             if all(isapprox.($ma * cinv - $id, zero($T); atol = 1e-8))
-                MultiVector(algebra(mv), $BIinv, Tuple(cinv))
+                MultiVector(Algebra(mv), $BIinv, Tuple(cinv))
             else
                 throw(SingularException)
             end
@@ -393,7 +461,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
     K = length(BIsa)
     coeffexpr = Expr(:call, Expr(:curly, :NTuple, K, T), Expr(:call, :tuple, coeffexpr...))
     quote
-        reverse(mv) * inv(MultiVector(algebra(mv), $BIsa, $coeffexpr))
+        @inbounds reverse(mv) * inv(MultiVector(Algebra(mv), $BIsa, $coeffexpr))
     end
 end
 
@@ -402,7 +470,7 @@ function inv_fallback(mv::MultiVector)
     e = vector(basevector(algebra(mv), :𝟏))
     c = M \ e
     bi = findall(!iszero, c)
-    MultiVector(algebra(mv), Tuple(bi), Tuple(c[bi]))
+    MultiVector(Algebra(mv), Tuple(bi), Tuple(c[bi]))
 end
 
 """
@@ -457,7 +525,7 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
         else
             baseselector = Tuple([findfirst(isequal(i), bi) for i in ncset])
             coeftuple = Expr(:call, :tuple, map(i -> :(coefficients(mv)[$i]), baseselector)...)
-            ncsetmvexpr = :(MultiVector(algebra(mv), $(Tuple(ncset)), $coeftuple))
+            ncsetmvexpr = :(MultiVector(Algebra(mv), $(Tuple(ncset)), $coeftuple))
             basesquares = [mt[i][i][2] for i in ncset]
             crosstermscancel =
                 all(iszero(mt[i][j][2] + mt[j][i][2]) for i in ncset, j in ncset if i < j)
@@ -481,7 +549,7 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
             end
         end
     end
-    prodexpr
+    :(@inbounds $prodexpr)
 end
 
 
@@ -535,7 +603,7 @@ end
 Calculates the outermorphism f of the MultiVector defined by f(v) = Av if v is in the grade-1 subspace of the algebra.
 """
 @generated function outermorphism(A::AbstractMatrix, mv::MultiVector)
-    ca = algebra(mv)
+    ca = Algebra(mv)
     bi = baseindices(mv)
     bt = basetable(ca)
     bv = reduce(union, bt[collect(bi)])
@@ -558,9 +626,9 @@ Calculates the outermorphism f of the MultiVector defined by f(v) = Av if v is i
         end
         quote
             @assert size(A,1) == size(A,2) == $(order(ca)) "The matrix A must be N×N where N is the order of the algebra."
-            ca = algebra(mv)
+            ca = Algebra(mv)
             f = $nb
-            $s
+            @inbounds $s
         end
     end
 end

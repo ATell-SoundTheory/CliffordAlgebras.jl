@@ -4,6 +4,38 @@ import Base.show
 import Combinatorics.levicivita
 import PrettyTables.pretty_table
 
+
+"""
+    basevectorproduct(Npos::Integer, Nneg::Integer, Nzero::Integer, base::Tuple, kl::Integer, kr::Integer)
+
+Finds the product of the kl-th base vector with the kr-th base vector. Returns a base vector index and a scale factor.
+"""
+function basevectorproduct(Npos::Integer, Nneg::Integer, base::Tuple, kl::Integer, kr::Integer)
+    K = length(base)
+    @assert kr <= K && kl <= K
+    selector_left = base[kl]
+    selector_right = base[kr]
+    selector_prod = collect((selector_left..., selector_right...))
+    permutation = sortperm(selector_prod)
+    coeff = levicivita(permutation)
+    v = []
+    for b in unique(selector_prod[permutation])
+        c = count(isequal(b), selector_prod)
+        @assert c in (1, 2)
+        if c == 1
+            push!(v, b)
+        else
+            coeff *= (b <= Npos) ? 1 : (b <= Npos + Nneg) ? -1 : 0
+        end
+    end
+    v = Tuple(v)
+    vl = length(v)
+    bi = findfirst(b -> length(b) == vl && length(intersect(b, v)) == vl, base)
+    coeff *= levicivita(findpermutation(v, base[bi]))
+    (bi, coeff)
+end
+
+
 """
     multiplicationstable(Npos::Integer, Nneg::Integer, Nzero::Integer, base::Tuple)
 
@@ -15,26 +47,7 @@ function multiplicationtable(Npos::Integer, Nneg::Integer, Nzero::Integer, base:
     @assert length(base) == K
     M = Matrix{Tuple}(undef, K, K)
     for kl = 1:K, kr = 1:K
-        selector_left = base[kl]
-        selector_right = base[kr]
-        selector_prod = collect((selector_left..., selector_right...))
-        permutation = sortperm(selector_prod)
-        coeff = levicivita(permutation)
-        v = []
-        for b in unique(selector_prod[permutation])
-            c = count(isequal(b), selector_prod)
-            @assert c in (1, 2)
-            if c == 1
-                push!(v, b)
-            else
-                coeff *= (b <= Npos) ? 1 : (b <= Npos + Nneg) ? -1 : 0
-            end
-        end
-        v = Tuple(v)
-        vl = length(v)
-        bi = findfirst(b -> length(b) == vl && length(intersect(b, v)) == vl, base)
-        coeff *= levicivita(findpermutation(v, base[bi]))
-        M[kl, kr] = (bi, coeff)
+        M[kl, kr] = basevectorproduct(Npos, Nneg, base, kl, kr)
     end
     ntuple(row -> ntuple(col -> M[row, col], K), K)
 end
