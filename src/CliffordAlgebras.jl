@@ -3,6 +3,7 @@ module CliffordAlgebras
 export CliffordAlgebra
 export order, signature, dimension, character
 export basesymbol, show, show_multivector
+export cayleytable, signaturetable
 
 export MultiVector
 export zero, iszero, one, isone

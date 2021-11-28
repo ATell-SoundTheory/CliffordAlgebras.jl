@@ -111,8 +111,8 @@ Generates a predefined algebra from a identifier. Known algebras are
     - :Quaternions or :ℍ
     - :Cl2 and :Cl3
     - :Spacetime
-    - :PGA2D or :Projective2D
-    - :PGA3D or :Projective3D
+    - :PGA2D or :Projective2D or :Plane2D
+    - :PGA3D or :Projective3D or :Plane3D
     - :CGA2D or :Conformal2D
     - :CGA3D or :Conformal3D
     - :DCGA3D or :DoubleConformal3D
@@ -135,9 +135,9 @@ function CliffordAlgebra(a::Symbol)
         return CliffordAlgebra(3)
     elseif a in (:Spacetime, :STA)
         return CliffordAlgebra(1, 3, 0, (:t, :x, :y, :z))
-    elseif a in (:PGA2D, :Projective2D)
+    elseif a in (:PGA2D, :Projective2D, :Plane2D)
         return CliffordAlgebra(2, 0, 1, (:e1, :e2, :e0))
-    elseif a in (:PGA3D, :Projective3D)
+    elseif a in (:PGA3D, :Projective3D, :Plane3D)
         return CliffordAlgebra(3, 0, 1, (:e1, :e2, :e3, :e0))
     elseif a in (:CGA2D, :Conformal2D)
         return CliffordAlgebra(3, 1, 0, (:e1, :e2, :e₊, :e₋))
@@ -185,6 +185,15 @@ multtable(::Type{<:CliffordAlgebra{Np,Nn,Nz,S,BT,MT}}) where {Np,Nn,Nz,S,BT,MT} 
 multtable(ca::CliffordAlgebra) = multtable(typeof(ca))
 
 """
+    baseproduct(::CliffordAlgebra, nleft::Integer, nright::Integer)
+    baseproduct(::Type{<:CliffordAlgebra}, nleft::Integer, nright::Integer)
+
+Returns a tuple holding the basis index and the scalar coefficient of the geometric product of the two basis vectors with indices nleft and nright.
+"""
+baseproduct(::Type{CliffordAlgebra{Np,Nn,Nz,S,BT}}, nleft::Integer, nright::Integer) where {Np,Nn,Nz,S,BT} = basevectorproduct(Np, Nn, BT, nleft, nright)
+baseproduct(ca::CliffordAlgebra, nleft::Integer, nright::Integer) = baseproduct(typeof(ca), nleft, nright)
+
+"""
     order(::CliffordAlgebra)
     order(::Type{<:CliffordAlgebra})
 
@@ -208,7 +217,7 @@ signature(ca::CliffordAlgebra) = signature(typeof(ca))
 
 Returns the signature value of the n-th basis 1-vector. The return value is +1, -1 or 0.
 """
-function basesignature(::Type{<:CliffordAlgebra{Np,Nn,Nz}}, n::Integer) where {Np,Nn,Nz}
+function basesignature(CA::Type{<:CliffordAlgebra{Np,Nn,Nz}}, n::Integer) where {Np,Nn,Nz}
     @assert 1 <= n <= order(CA)
     if n <= Np
         return +1
@@ -276,12 +285,18 @@ end
 basesymbol(ca::CliffordAlgebra, n::Integer) = basesymbol(typeof(ca), n)
 
 
-function show(io::IO, ca::CliffordAlgebra)
-    (Np, Nn, Nz) = signature(ca)
-    println(io, "Cl(", Np, ",", Nn, ",", Nz, ")")
-    dim = dimension(ca)
-    bs = map(s -> s == Symbol() ? Symbol("1") : s, ntuple(k -> basesymbol(ca, k), dim))
-    mt = multtable(ca)
+"""
+    caleytable(io::IO, ca::CliffordAlgebra)
+    caleytable(io::IO, CA::Type{<:CliffordAlgebra})
+
+Generates a Cayley table view of the algebra.
+"""
+cayleytable(io::IO, ca::CliffordAlgebra) = cayleytable(io, typeof(ca))
+
+function cayleytable(io::IO, CA::Type{<:CliffordAlgebra})
+    dim = dimension(CA)
+    bs = map(s -> s == Symbol() ? Symbol("1") : s, ntuple(k -> basesymbol(CA, k), dim))
+    mt = multtable(CA)
     table = Matrix{String}(undef, dim, dim)
     for col = 1:dim
         for row = 1:dim
@@ -298,8 +313,9 @@ function show(io::IO, ca::CliffordAlgebra)
             end
         end
     end
-    lines = vcat(0, cumsum([binomial(order(ca), i) for i = 0:order(ca)]))
+    lines = vcat(0, cumsum([binomial(order(CA), i) for i = 0:order(CA)]))
     pretty_table(
+        io,
         table;
         show_row_number = false,
         crop = :none,
@@ -308,4 +324,41 @@ function show(io::IO, ca::CliffordAlgebra)
         vlines = lines,
         hlines = lines,
     )
+end
+
+
+"""
+    signaturetable(io::IO, ca::CliffordAlgebra)
+    signaturetable(io::IO, CA::Type{<:CliffordAlgebra})
+
+Prints the 1-vector basis symbols and their squares.
+"""
+signaturetable(io::IO, ca::CliffordAlgebra) = signaturetable(io, typeof(ca))
+
+function signaturetable(io::IO, CA::Type{<:CliffordAlgebra})
+    bs = ntuple( k -> basesymbol(CA, k+1), order(CA))
+    table = Matrix{String}(undef, order(CA), 2)
+    for (n,s) = enumerate(bs)
+        sig = basesignature(CA,n)
+        table[n,1] = string(s)
+        table[n,2] = sig == +1 ? "+1" : sig == -1 ? "-1" : "0"
+    end
+    pretty_table(
+        io,
+        table;
+        show_row_number = false,
+        crop = :none,
+        noheader = true,
+        alignment = :c
+    )
+end
+
+function show(io::IO, ca::CliffordAlgebra)
+    (Np, Nn, Nz) = signature(ca)
+    println(io, "Cl(", Np, ",", Nn, ",", Nz, ")")
+    if dimension(ca) <= 32
+        cayleytable(io, ca)
+    else
+        signaturetable(io, ca)
+    end
 end
