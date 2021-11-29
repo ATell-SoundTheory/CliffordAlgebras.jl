@@ -17,6 +17,8 @@ Generate a Clifford algebra:
 ```
 julia> cl2 = CliffordAlgebra(2)
 Cl(2,0,0)
+
+julia> calyeytable(stdout, cl2)
 ┌───────┬──────────────┬───────┐
 │  +1   │  +e1    +e2  │ +e1e2 │
 ├───────┼──────────────┼───────┤
@@ -28,6 +30,8 @@ Cl(2,0,0)
 
 julia> cl101 = CliffordAlgebra(1,0,1)
 Cl(1,0,1)
+
+julia> cayleytable(stdout, cl101)
 ┌───────┬──────────────┬───────┐
 │  +1   │  +e1    +e2  │ +e1e2 │
 ├───────┼──────────────┼───────┤
@@ -39,6 +43,16 @@ Cl(1,0,1)
 
 julia> sta = CliffordAlgebra(:Spacetime)
 Cl(1,3,0)
+
+julia> signaturetable(stdout, sta)
+┌───┬────┐
+│ t │ +1 │
+│ x │ -1 │
+│ y │ -1 │
+│ z │ -1 │
+└───┴────┘
+
+julia> cayleytable(stdout, sta)
 ┌───────┬────────────────────────────┬──────────────────────────────────────────┬────────────────────────────┬───────┐
 │  +1   │  +t     +x     +y     +z   │  +tx    +ty    +xy    +tz    +zx    +yz  │ +tyx   +txz   +tzy   +xyz  │ +txyz │
 ├───────┼────────────────────────────┼──────────────────────────────────────────┼────────────────────────────┼───────┤
@@ -63,7 +77,7 @@ Cl(1,3,0)
 └───────┴────────────────────────────┴──────────────────────────────────────────┴────────────────────────────┴───────┘
 ```
 
-Get the basis vector names from the generated algebra and use the base vectors to construct multivectors.
+Get the basis vector names from the generated algebra and use the base vectors to construct multivectors:
 
 ```
 julia> propertynames(cl2)
@@ -76,7 +90,7 @@ julia> mv2 = mv1 - cl2.e1e2
 +1.0+2.0×e1 ∈ Cl(2, 0, 0)
 ```
 
-Use the geometric product and derived products with the multivectors.
+Use the geometric product and derived products with the multivectors:
 ```
 julia> mv1 * mv2
 +5.0+4.0×e1-2.0×e2+1.0×e1e2 ∈ Cl(2, 0, 0)
@@ -109,7 +123,7 @@ julia> mv1 ≀ mv2
 +14.0+12.0×e1-8.0×e2 ∈ Cl(2, 0, 0)
 ```
 
-Calculate the inverse of a multivector and divde multivectors.
+Calculate the inverse of a multivector and divde multivectors:
 
 ``` 
 julia> inv(mv2)
@@ -122,7 +136,7 @@ julia> mv2 \ mv1
 +0.9999999999999998+0.6666666666666665×e2-0.33333333333333326×e1e2 ∈ Cl(2, 0, 0)
 ``` 
 
-Calculate duals and involutions.
+Calculate duals and involutions:
 
 ```
 julia> dual(mv1)
@@ -147,7 +161,7 @@ julia> mv1'
 -1.0+2.0×e2+1.0×e1e2 ∈ Cl(2, 0, 0)
 ```
 
-Extract subspaces.
+Extract subspaces:
 
 ```
 julia> scalar(mv1)
@@ -166,7 +180,7 @@ julia> Λᵏ(mv1,2)
 +1.0×e1e2 ∈ Cl(2, 0, 0)
 ```
 
-Calculate the norm of a multivector, evaluate the exponential function and use the sandwich product.
+Calculate the norm of a multivector, evaluate the exponential function and use the sandwich product:
 
 ```
 julia> R = cl2.e1e2 * π/8
@@ -182,7 +196,7 @@ julia> exp(R) ≀ cl2.e1
 +0.7071067811865475×e1-0.7071067811865477×e2 ∈ Cl(2, 0, 0)
 ```
 
-Map multivectors to their matrix algebra counterparts.
+Map multivectors to their matrix algebra counterparts:
 
 ```
 julia> vector(mv1)
@@ -204,4 +218,15 @@ true
 
 julia> matrix(mv2)*vector(mv1) == vector(mv2*mv1)
 true
+```
+
+Apply outermorphisms:
+```
+julia> M = [0 1 ; 1 0]
+2×2 Matrix{Int64}:
+ 0  1
+ 1  0
+
+julia> outermorphism(M, mv1)
++1.0+2.0×e2-1.0×e1e2 ∈ Cl(2, 0, 0)
 ```
