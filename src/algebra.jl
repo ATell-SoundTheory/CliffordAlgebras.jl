@@ -57,7 +57,7 @@ end
 
 CliffordAlgebra{Np,Nn,Nz,S} is a type that describes a geometric algebra with the signature (Np,Nn,Nz), base symbols S.
 """
-struct CliffordAlgebra{Np,Nn,Nz,S,BT,MT}
+struct CliffordAlgebra{Np,Nn,Nz,S,BT}
     function CliffordAlgebra(
         Npos::Integer,
         Nneg::Integer,
@@ -69,8 +69,7 @@ struct CliffordAlgebra{Np,Nn,Nz,S,BT,MT}
         Nzero = Int(Nzero)
         @assert Npos + Nneg + Nzero == N
         BT = adaptbasefordual(enumeratebase(Int(N)))
-        MT = multiplicationtable(Npos, Nneg, Nzero, BT)
-        new{Npos,Nneg,Nzero,BaseSymbols,BT,MT}()
+        new{Npos,Nneg,Nzero,BaseSymbols,BT}()
     end
 end
 
@@ -181,7 +180,7 @@ basetable(ca::CliffordAlgebra) = basetable(typeof(ca))
 
 Returns the internal multuplication table of the geometric product of the algebra.
 """
-multtable(::Type{<:CliffordAlgebra{Np,Nn,Nz,S,BT,MT}}) where {Np,Nn,Nz,S,BT,MT} = MT
+multtable(::Type{<:CliffordAlgebra{Np,Nn,Nz,S,BT}}) where {Np,Nn,Nz,S,BT} = multiplicationtable(Np, Nn, Nz, BT)
 multtable(ca::CliffordAlgebra) = multtable(typeof(ca))
 
 """
@@ -245,7 +244,7 @@ dimension(ca::CliffordAlgebra) = dimension(typeof(ca))
 
 Returns the square of the pseudoscalar of the algebra.
 """
-character(CA::Type{<:CliffordAlgebra}) = multtable(CA)[dimension(CA)][dimension(CA)][2]
+character(CA::Type{<:CliffordAlgebra}) = baseproduct(CA, dimension(CA), dimension(CA))[2]
 character(ca::CliffordAlgebra) = character(typeof(ca))
 
 """

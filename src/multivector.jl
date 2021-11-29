@@ -257,7 +257,7 @@ Returns the MultiVector that has all the basis vector products reversed.
 """
 function reverse(mv::MultiVector)
     # Reverses the order of the canonical basis products
-    CA = algebra(mv)
+    CA = Algebra(mv)
     BI = baseindices(mv)
     s = map(n -> basereverse(CA, n), BI)
     MultiVector(CA, BI, coefficients(mv) .* s)
@@ -394,11 +394,11 @@ Returns the matrix algebra representation of the MultiVector.
 function matrix(mv::MultiVector)
     ca = algebra(mv)
     d = dimension(ca)
-    mt = multtable(ca)
     T = eltype(mv)
     M = zeros(T, d, d)
     for (c, b) in zip(coefficients(mv), baseindices(mv))
-        for (bi, (bo, mc)) in enumerate(mt[b])
+        for bi = 1:d
+            (bo, mc) = baseproduct(ca, b, bi)
             M[bo, bi] += c * mc
         end
     end

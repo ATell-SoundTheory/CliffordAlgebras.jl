@@ -3,7 +3,9 @@
 import Base.+, Base.-, Base.*, Base./, Base.\
 import Base.inv, Base.adjoint, Base.exp
 import LinearAlgebra.norm, LinearAlgebra.norm_sqr
+import LinearAlgebra.SingularException
 import StaticArrays.SVector, StaticArrays.SMatrix
+import SparseArrays.sparse, SparseArrays.sparsevec
 
 
 @generated function (+)(a::MultiVector{CA,Ta}, b::MultiVector{CA,Tb}) where {CA,Ta,Tb}
@@ -44,10 +46,9 @@ function generatefilteredprod(
     ::Val{Filter},
 ) where {CA,Ta,Tb,Filter}
     d = dimension(CA)
-    mt = multtable(CA)
     acc = [NTuple{3,Int}[] for n = 1:d]
     for (ka, base_a) in enumerate(baseindices(a)), (kb, base_b) in enumerate(baseindices(b))
-        baseidx, coeff = mt[base_a][base_b]
+        baseidx, coeff = baseproduct(CA, base_a, base_b)
         leftgrade = basegrade(CA, base_a)
         rightgrade = basegrade(CA, base_b)
         productgrade = basegrade(CA, baseidx)
@@ -192,11 +193,10 @@ function generatesymprod(
     ::Val{P}
 ) where {CA,Ta,Tb,P}
     d = dimension(CA)
-    mt = multtable(CA)
     acc = [NTuple{3,Int}[] for n = 1:d]
     for (ka, base_a) in enumerate(baseindices(a)), (kb, base_b) in enumerate(baseindices(b))
-        baseidx1, coeff1 = mt[base_a][base_b]
-        baseidx2, coeff2 = mt[base_b][base_a]
+        baseidx1, coeff1 = baseproduct(CA, base_a, base_b)
+        baseidx2, coeff2 = baseproduct(CA, base_b, base_a)
         if baseidx1 == baseidx2
             coeff = coeff1 + P * coeff2
             if !iszero(coeff)
@@ -276,14 +276,13 @@ Calculates the anti-commutator ab+ba of two MultiVectors a and b.
 ) where {CA,Ta,Tb}
     # a * b * reverse(a)
     d = dimension(CA)
-    mt = multtable(CA)
     acc = [NTuple{4,Int}[] for n = 1:d]
     for (ka, base_a) in enumerate(baseindices(a)),
         (kb, base_b) in enumerate(baseindices(b)),
         (ka_rev, base_a_rev) in enumerate(baseindices(a))
 
-        leftbaseidx, leftcoeff = mt[base_a][base_b]
-        baseidx, rightcoeff = mt[leftbaseidx][base_a_rev]
+        leftbaseidx, leftcoeff = baseproduct(CA, base_a, base_b)
+        baseidx, rightcoeff = baseproduct(CA, leftbaseidx, base_a_rev)
         coeff = leftcoeff * rightcoeff * basereverse(CA, base_a_rev)
         if !iszero(coeff)
             push!(acc[baseidx], (ka, kb, ka_rev, coeff))
@@ -376,6 +375,7 @@ norm_sqr(mv::MultiVector) = scalar(Λᵏ(mv * reverse(mv), 0))
 Finds the inverse of the MultiVector. If no inverse exists a SingularException is thrown.
 """
 @generated function inv(mv::MultiVector)
+#function inv_generator(mv::Type{<:MultiVector})
     # Strategy: We can reduce the size of the problem
     # by looking only at self-adjoint multivectors.
     # Note that inv(a) == a' * inv(a' a) == a' * inv(a a').
@@ -391,8 +391,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
     T = eltype(mv)
     BI = baseindices(mv)
     d = dimension(CA)
-    mt = multtable(CA)
-    basesquares = map(n -> mt[n][n][2], BI)
+    basesquares = map(n -> baseproduct(CA, n, n)[2], BI)
     reversesigns = map(n -> basereverse(CA, n), BI)
     if all(iszero, basesquares)
         # singular in all cases
@@ -417,7 +416,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
                 unique(
                     skipmissing(
                         Iterators.flatten([
-                            iszero(mt[r][c][2]) ? missing : mt[r][c][1] for r in BI,
+                            iszero(baseproduct(CA, r, c)[2]) ? missing : baseproduct(CA, r, c)[1] for r in BI,
                             c in BIinv
                         ]),
                     ),
@@ -426,28 +425,57 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
         )
         ea = [Expr(:call, :+) for r = 1:length(BIone), c = 1:length(BIinv)]
         for (i1, bi1) in enumerate(BI), (i2, bi2) in enumerate(BIinv)
-            (bi3, pc) = mt[bi1][bi2]
+            (bi3, pc) = baseproduct(CA, bi1, bi2)
             i3 = findfirst(isequal(bi3), BIone)
             push!(ea[i3, i2].args, :($pc * c[$i1]))
         end
-        ea = map(ex -> length(ex.args) == 1 ? :(zero($T)) : ex, ea)
-        ma = Expr(:call, Expr(:curly, :SMatrix, length(BIone), length(BIinv)), ea[:]...)
-        id = Expr(:call, :SVector, ntuple(i -> i == 1 ? one(T) : zero(T), length(BIone))...)
-        return quote
-            c = coefficients(mv)
-            cinv = $ma \ $id
-            if all(isapprox.($ma * cinv - $id, zero($T); atol = 1e-8))
-                MultiVector(Algebra(mv), $BIinv, Tuple(cinv))
-            else
-                throw(SingularException)
+        if d <= 8   # this is just a guess and needs some measurements 
+            ea = map(ex -> length(ex.args) == 1 ? :(zero($T)) : ex, ea)
+            ma = Expr(:call, Expr(:curly, :SMatrix, length(BIone), length(BIinv)), ea[:]...)
+            id = Expr(:call, :SVector, ntuple(i -> i == 1 ? one(T) : zero(T), length(BIone))...)
+            return quote
+                c = coefficients(mv)
+                ma = $ma
+                id = $id
+                cinv = ma \ id
+                if all(isapprox.(ma * cinv - id, zero($T); atol = 1e-8))
+                    MultiVector(Algebra(mv), $BIinv, Tuple(cinv))
+                else
+                    throw(SingularException)
+                end
+            end
+        else
+            iT = typeof(inv(one(T)))
+            nzea = findall(ex -> length(ex.args) > 1, ea)
+            rows = map( ci -> ci[1], nzea)
+            cols = map( ci -> ci[2], nzea)
+            vals = map( ci -> ea[ci], nzea)
+            rowsexpr = Expr(:ref, :Int, rows...)
+            colsexpr = Expr(:ref, :Int, cols...)
+            valsexpr = Expr(:ref, :($iT), vals... )
+            rowcount = length(BIone)
+            colcount = length(BIinv)
+            return quote
+                c = coefficients(mv)
+                rows = $rowsexpr
+                cols = $colsexpr
+                vals = $valsexpr
+                ma = sparse(rows, cols, vals, $rowcount, $colcount)
+                id = sparsevec([1],[one($iT)],$rowcount)
+                cinv = Array(ma) \ Array(id)
+                if all(isapprox.(ma * cinv - id, zero($iT); atol = 1e-8))
+                    MultiVector(Algebra(mv), $BIinv, Tuple(cinv))
+                else
+                    throw(SingularException)
+                end
             end
         end
     end
     # We reduce the general case to that of self-adjoint inverses
     products = Tuple(
-        (i1, i2, mt[b1][b2][1], mt[b1][b2][2]) for
+        (i1, i2, baseproduct(CA, b1, b2)...) for
         (i1, b1) in enumerate(BI), (i2, b2) in enumerate(BI) if
-        !iszero(mt[b1][b2][2]) && isone(basereverse(CA, mt[b1][b2][1]))
+        !iszero(baseproduct(CA, b1, b2)[2]) && isone(basereverse(CA, baseproduct(CA, b1, b2)[1]))
     )
     BIsa = Tuple(sort(unique(map(p -> p[3], products))))
     coeffexpr = [Expr(:call, :+) for b in BIsa]
@@ -505,8 +533,7 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
     # 1. Identify (optimal) subsets of base vectors so that all vectors in such a set commute with all vectors outside the set. 
     ca = algebra(mv)
     bi = baseindices(mv)
-    mt = multtable(ca)
-    ct = [iszero(mt[i][j][2] - mt[j][i][2]) for i in bi, j in bi]
+    ct = [iszero(baseproduct(ca, i, j)[2] - baseproduct(ca, j, i)[2]) for i in bi, j in bi]
     ncsets = Vector{Int}[]
     for (ki, i) in enumerate(bi)
         nc = union(collect(bi[findall(!, ct[ki, :])]), Int[i])
@@ -526,9 +553,9 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
             baseselector = Tuple([findfirst(isequal(i), bi) for i in ncset])
             coeftuple = Expr(:call, :tuple, map(i -> :(coefficients(mv)[$i]), baseselector)...)
             ncsetmvexpr = :(MultiVector(Algebra(mv), $(Tuple(ncset)), $coeftuple))
-            basesquares = [mt[i][i][2] for i in ncset]
+            basesquares = [baseproduct(ca, i, i)[2] for i in ncset]
             crosstermscancel =
-                all(iszero(mt[i][j][2] + mt[j][i][2]) for i in ncset, j in ncset if i < j)
+                all(iszero(baseproduct(ca, i, j)[2] + baseproduct(ca, j, i)[2]) for i in ncset, j in ncset if i < j)
             if all(basesquares .== basesquares[1]) && crosstermscancel
                 # We can simplify the series expansion
                 if isone(basesquares[1])
