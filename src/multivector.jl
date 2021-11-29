@@ -63,6 +63,10 @@ isone(mv::MultiVector) =
 
 (==)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = vector(a) == vector(b)
 
+(==)(a::MultiVector{CA}, b::Real) where CA = a == MultiVector(CA,b)
+(==)(a::Real, b::MultiVector) = b == a
+
+
 """
     coefficients(::MultiVector)
 

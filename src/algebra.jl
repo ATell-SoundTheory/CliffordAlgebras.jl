@@ -53,9 +53,10 @@ function multiplicationtable(Npos::Integer, Nneg::Integer, Nzero::Integer, base:
 end
 
 """
-    CliffordAlgebra
+    CliffordAlgebra(Npos::Integer, Nneg::Integer, Nzero::Integer, S::NTuple(N,Symbol))
 
-CliffordAlgebra{Np,Nn,Nz,S} is a type that describes a geometric algebra with the signature (Np,Nn,Nz), base symbols S.
+Singleton instance of the type CliffordAlgebra that describes a geometric algebra with the signature (Npos,Nneg,Nzero), base symbols S.
+The base symbols are in order of the signature.
 """
 struct CliffordAlgebra{Np,Nn,Nz,S,BT}
     function CliffordAlgebra(
@@ -67,7 +68,8 @@ struct CliffordAlgebra{Np,Nn,Nz,S,BT}
         Npos = Int(Npos)
         Nneg = Int(Nneg)
         Nzero = Int(Nzero)
-        @assert Npos + Nneg + Nzero == N
+        @assert Npos >= 0 && Nneg >= 0 && Nzero >=0 "Algebra signature must be non-negative."
+        @assert Npos + Nneg + Nzero == N "Base symbol count must match signature."
         BT = adaptbasefordual(enumeratebase(Int(N)))
         new{Npos,Nneg,Nzero,BaseSymbols,BT}()
     end
@@ -79,6 +81,7 @@ end
 Generates a geometric algebra with signature (N,0,0).
 """
 function CliffordAlgebra(N::Integer)
+    @assert N>=0 "Algbra signature must be non-negative."
     CliffordAlgebra(N, 0, 0, ntuple(i -> Symbol(:e, i), N))
 end
 
@@ -88,6 +91,7 @@ end
 Generates a geometric algebra with signature (Npos,Nneg,0).
 """
 function CliffordAlgebra(Npos::Integer, Nneg::Integer)
+    @assert Npos >= 0 && Nneg >= 0 "Algbra signature must be non-negative."
     CliffordAlgebra(Npos, Nneg, 0, ntuple(i -> Symbol(:e, i), Npos + Nneg))
 end
 
@@ -97,6 +101,7 @@ end
 Generates a geometric algebra with signature (Npos,Nneg,Nzero).
 """
 function CliffordAlgebra(Npos::Integer, Nneg::Integer, Nzero::Integer)
+    @assert Npos >= 0 && Nneg >= 0 && Nzero >= 0 "Algbra signature must be non-negative."
     CliffordAlgebra(Npos, Nneg, Nzero, ntuple(i -> Symbol(:e, i), Npos + Nneg + Nzero))
 end
 
@@ -107,6 +112,8 @@ Generates a predefined algebra from a identifier. Known algebras are
     - :Hyperbolic or :Hyper
     - :Complex or :ℂ
     - :Dual or :Grassmann
+    - :Grassmann2D or :G2
+    - :Grassmann3D or :G3
     - :Quaternions or :ℍ
     - :Cl2 and :Cl3
     - :Spacetime
@@ -126,6 +133,10 @@ function CliffordAlgebra(a::Symbol)
         return CliffordAlgebra(0, 1, 0, (:i,))
     elseif a in (:Dual, :Grassmann)
         return CliffordAlgebra(0, 0, 1, (:ε,))
+    elseif a in (:Grassmann2D, :G2)
+        return CliffordAlgebra(0, 0, 2, (:ε₁, :ε₂))
+    elseif a in (:Grassmann3D, :G3)
+        return CliffordAlgebra(0, 0, 3, (:ε₁, :ε₂, :ε₃))
     elseif a in (:Quaternions, :ℍ)
         return CliffordAlgebra(0, 2, 0, (:i, :j))
     elseif a in (:Cl2,)
@@ -147,11 +158,11 @@ function CliffordAlgebra(a::Symbol)
     elseif a in (:TCGA3D, :TripleConformal3D)
         return CliffordAlgebra(9, 3)
     elseif a in (:DCGSTA, :DoubleConformalSpacetime)
-        return CliffordAlgebra(4, 8)
+        return CliffordAlgebra(4, 8, 0, (:t₁, :t₂, :e₊₁, :e₊₂, :x₁, :x₂, :y₁, :y₂, :z₁, :z₂, :e₋₁, :e₋₂))
     elseif a in (:QCGA, :QuadricConformal)
         return CliffordAlgebra(9, 6)
     else
-        error("Unknown algebra.")
+        throw(ArgumentError("Unknown algebra."))
     end
 end
 
@@ -355,9 +366,4 @@ end
 function show(io::IO, ca::CliffordAlgebra)
     (Np, Nn, Nz) = signature(ca)
     println(io, "Cl(", Np, ",", Nn, ",", Nz, ")")
-    if dimension(ca) <= 32
-        cayleytable(io, ca)
-    else
-        signaturetable(io, ca)
-    end
 end

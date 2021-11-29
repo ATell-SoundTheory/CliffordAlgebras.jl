@@ -145,47 +145,65 @@ Calculates the geometric product of two MultiVectors a and b.
 
 Calculates the wedge product between two MultiVectors a and b.
 """
-(∧)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    exteriorprod(a, b)
+(∧)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = exteriorprod(a, b)
+(∧)(a::MultiVector{CA}, b::Real) where {CA} = a ∧ MultiVector(CA,b)
+(∧)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ∧ b
+(∧)(a::Real, b::Real) = a * b
+
 
 """
     a ⋅ b
 
 Calculates the "fat dot" product between the MultiVectors a and b.
 """
-(⋅)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    fatdotprod(a, b)
+(⋅)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = fatdotprod(a, b)
+(⋅)(a::MultiVector{CA}, b::Real) where {CA} = a ⋅ MultiVector(CA,b)
+(⋅)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ⋅ b
+(⋅)(a::Real, b::Real) = a * b
+
 
 """
     a ⨼ b
 
 Calculates the left contraction of the MultiVectors a and b.
 """
-(⨼)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    leftcontractionprod(a, b)
+(⨼)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = leftcontractionprod(a, b)
+(⨼)(a::MultiVector{CA}, b::Real) where {CA} = a ⨼ MultiVector(CA,b)
+(⨼)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ⨼ b
+(⨼)(a::Real, b::Real) = a * b
+
 
 """
     a ⨽ b
 
 Calculates the right contraction of the MultiVectors a and b.
 """
-(⨽)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    rightcontractionprod(a, b)
+(⨽)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = rightcontractionprod(a, b)
+(⨽)(a::MultiVector{CA}, b::Real) where {CA} = a ⨽ MultiVector(CA,b)
+(⨽)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ⨽ b
+(⨽)(a::Real, b::Real) = a * b
 
 """
     a ⋆ b
 
 Calculates the scalar product of the MultiVectors a and b.
 """
-(⋆)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} =
-    scalarprod(a, b)
+(⋆)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = scalarprod(a, b)
+(⋆)(a::MultiVector{CA}, b::Real) where {CA} = a ⋆ MultiVector(CA,b)
+(⋆)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ⋆ b
+(⋆)(a::Real, b::Real) = a * b
+
 
 """
     a ∨ b
 
-Calculates the vee product of the MultiVectors a and b.
+Calculates the regressive product of the MultiVectors a and b.
 """
 (∨)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = dual(dual(a) ∧ dual(b))
+(∨)(a::MultiVector{CA}, b::Real) where {CA} = a ∨ MultiVector(CA,b)
+(∨)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ∨ b
+(∨)(a::Real, b::Real) where {CA} = zero(promote_type(typeof(a),typeof(b)))
+
 
 function generatesymprod(
     a::Type{<:MultiVector{CA,Ta}},
@@ -244,8 +262,6 @@ end
 end
 
 
-
-
 """
     a ×₋ b
 
@@ -254,9 +270,9 @@ Calculates the commutator ab-ba of two MultiVectors a and b.
 (×₋)(a::MultiVector{CA,Ta}, b::MultiVector{CA,Tb}) where {CA,Ta,Tb} =
     inv(promote_type(Ta, Tb)(2)) * commutatorprod(a, b)
 
-(×₋)(a::Ta, b::MultiVector{CA,Tb}) where {CA,Ta<:Real,Tb} = zero(promote_type(Ta, Tb))
+(×₋)(::Ta, ::MultiVector{CA,Tb}) where {CA,Ta<:Real,Tb} = zero(promote_type(Ta, Tb))
 (×₋)(a::MultiVector, b::Real) = b ×₋ a
-(×₋)(a::Ta, b::Tb) where {Ta<:Real,Tb<:Real} = zero(promote_type(Ta, Tb))
+(×₋)(::Ta, ::Tb) where {Ta<:Real,Tb<:Real} = zero(promote_type(Ta, Tb))
 
 """
     a ×₊ b
@@ -314,6 +330,10 @@ end
 Calculates the sandwich product a*b*reverse(a) for two MultiVectors a and b.
 """
 (≀)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = sandwichproduct(a, b)
+(≀)(a::Real, b::MultiVector{CA}) where {CA} = a^2 * b
+(≀)(a::MultiVector{CA}, b::Real) where {CA} = b * a *reverse(a)
+(≀)(a::Real, b::Real) = a^2 * b
+
 
 """
     polarize(mv::MultiVector)
@@ -359,7 +379,7 @@ end
 
 Calculates the MultiVector norm defined as sqrt(grade(mv*reverse(mv),0))
 """
-norm(mv::MultiVector) = sqrt(scalar(Λᵏ(mv * reverse(mv), 0)))
+norm(mv::MultiVector) = sqrt(norm_sqr(mv))
 
 """
     norm_sqr(::MultiVector)
@@ -395,7 +415,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
     reversesigns = map(n -> basereverse(CA, n), BI)
     if all(iszero, basesquares)
         # singular in all cases
-        return :(throw(SingularException))
+        return :(throw(SingularException(0)))
     end
     if length(BI) == 1
         # trivial inverse
@@ -403,7 +423,7 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
         return quote
             c = coefficients(mv)[1]
             if iszero(c)
-                throw(SingularException)
+                throw(SingularException(1))
             end
             MultiVector(Algebra(mv), $BI, ($rc * inv(c),))
         end
@@ -439,9 +459,9 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
                 id = $id
                 cinv = ma \ id
                 if all(isapprox.(ma * cinv - id, zero($T); atol = 1e-8))
-                    MultiVector(Algebra(mv), $BIinv, Tuple(cinv))
+                    prune(MultiVector(Algebra(mv), $BIinv, Tuple(cinv)))
                 else
-                    throw(SingularException)
+                    throw(SingularException(2))
                 end
             end
         else
@@ -464,9 +484,9 @@ Finds the inverse of the MultiVector. If no inverse exists a SingularException i
                 id = sparsevec([1],[one($iT)],$rowcount)
                 cinv = Array(ma) \ Array(id)
                 if all(isapprox.(ma * cinv - id, zero($iT); atol = 1e-8))
-                    MultiVector(Algebra(mv), $BIinv, Tuple(cinv))
+                    prune(MultiVector(Algebra(mv), $BIinv, Tuple(cinv)))
                 else
-                    throw(SingularException)
+                    throw(SingularException(3))
                 end
             end
         end
