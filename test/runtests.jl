@@ -195,166 +195,166 @@ import LinearAlgebra.SingularException
             @test e2 ⋅ e2 == s2
             @test e3 ⋅ e3 == s3
 
-            @test e1 ⋅ e12 == e2
+            @test e1 ⋅ e12 == s1*e2
             @test e1 ⋅ e23 == 0
-            @test e1 ⋅ e31 == -e3
+            @test e1 ⋅ e31 == -s1*e3
 
-            @test e123 ⋅ e1 == e23
-            @test e123 ⋅ e2 == -e31
-            @test e123 ⋅ e3 == 0
-            @test e123 ⋅ e12 == e3
-            @test e123 ⋅ e23 == 0
-            @test e123 ⋅ e31 == 0
-            @test e123 ⋅ e123 == 0
+            @test e123 ⋅ e1 == s1*e23
+            @test e123 ⋅ e2 == s2*e31
+            @test e123 ⋅ e3 == s3*e12
+            @test e123 ⋅ e12 == -s1*s2*e3
+            @test e123 ⋅ e23 == -s2*s3*e1
+            @test e123 ⋅ e31 == -s3*s1*e2
+            @test e123 ⋅ e123 == -s1*s2*s3
 
             @test 2 ⋅ e1 == MultiVector(cl,2) ⋅ e1
             @test 2 ⋅ 3 == MultiVector(cl,2) ⋅ MultiVector(cl,3) 
         end
 
         @testset "left contraction product" begin
-            e1 ⨼ e1 == s1
-            e2 ⨼ e2 == s2
-            e3 ⨼ e3 == s3
+            @test e1 ⨼ e1 == s1
+            @test e2 ⨼ e2 == s2
+            @test e3 ⨼ e3 == s3
 
-            e1 ⨼ e12 == e2
-            e1 ⨼ e23 == 0
-            e1 ⨼ e31 == -e3
+            @test e1 ⨼ e12 == s1*e2
+            @test e1 ⨼ e23 == 0
+            @test e1 ⨼ e31 == -s1*e3
 
-            e123 ⨼ e1 == 0
-            e123 ⨼ e2 == 0
-            e123 ⨼ e3 == 0
+            @test e123 ⨼ e1 == 0
+            @test e123 ⨼ e2 == 0
+            @test e123 ⨼ e3 == 0
 
-            e123 ⨼ e12 == 0
-            e123 ⨼ e23 == 0
-            e123 ⨼ e31 == 0
+            @test e123 ⨼ e12 == 0
+            @test e123 ⨼ e23 == 0
+            @test e123 ⨼ e31 == 0
 
-            e123 ⨼ e123 == 0
+            @test e123 ⨼ e123 == 0
             
             @test 2 ⨼ e1 == MultiVector(cl,2) ⨼ e1
             @test 2 ⨼ 3 == MultiVector(cl,2) ⨼ MultiVector(cl,3)
         end
 
         @testset "right contraction product" begin
-            e1 ⨽ e1 == s1
-            e2 ⨽ e2 == s2
-            e3 ⨽ e3 == s3
+            @test e1 ⨽ e1 == s1
+            @test e2 ⨽ e2 == s2
+            @test e3 ⨽ e3 == s3
 
-            e1 ⨽ e12 == e2
-            e1 ⨽ e23 == 0
-            e1 ⨽ e31 == -e3
+            @test e1 ⨽ e12 == 0
+            @test e1 ⨽ e23 == 0
+            @test e1 ⨽ e31 == 0
 
-            e123 ⨽ e1 == 0
-            e123 ⨽ e2 == 0
-            e123 ⨽ e3 == 0
+            @test e123 ⨽ e1 == s1*e23
+            @test e123 ⨽ e2 == s2*e31
+            @test e123 ⨽ e3 == s3*e12
 
-            e123 ⨽ e12 == 0
-            e123 ⨽ e23 == 0
-            e123 ⨽ e31 == 0
+            @test e123 ⨽ e12 == -s1*s2*e3
+            @test e123 ⨽ e23 == -s2*s3*e1
+            @test e123 ⨽ e31 == -s3*s1*e2
 
-            e123 ⨽ e123 == 0
+            @test e123 ⨽ e123 == 0
             
             @test 2 ⨽ e1 == MultiVector(cl,2) ⨽ e1
             @test 2 ⨽ 3 == MultiVector(cl,2) ⨽ MultiVector(cl,3)
         end
 
         @testset "scalar product" begin
-            e1 ⋆ e1 == s1
-            e2 ⋆ e2 == s2
-            e3 ⋆ e3 == s3
+            @test e1 ⋆ e1 == s1
+            @test e2 ⋆ e2 == s2
+            @test e3 ⋆ e3 == s3
 
-            e1 ⋆ e12 == 0
-            e1 ⋆ e23 == 0
-            e1 ⋆ e31 == 0
+            @test e1 ⋆ e12 == 0
+            @test e1 ⋆ e23 == 0
+            @test e1 ⋆ e31 == 0
 
-            e123 ⋆ e1 == 0
-            e123 ⋆ e2 == 0
-            e123 ⋆ e3 == 0
+            @test e123 ⋆ e1 == 0
+            @test e123 ⋆ e2 == 0
+            @test e123 ⋆ e3 == 0
 
-            e123 ⋆ e123 == 0
+            @test e123 ⋆ e123 == s1 * s2 * s3
 
             @test 2 ⋆ e1 == MultiVector(cl,2) ⋆ e1
             @test 2 ⋆ 3 == MultiVector(cl,2) ⋆ MultiVector(cl,3)
         end
 
         @testset "regressive product" begin
-            e1 ∨ e1 == 0
-            e2 ∨ e2 == 0
-            e3 ∨ e3 == 0
+            @test e1 ∨ e1 == 0
+            @test e2 ∨ e2 == 0
+            @test e3 ∨ e3 == 0
 
-            e1 ∨ e23 == 1
-            e2 ∨ e31 == 1
-            e3 ∨ e12 == 1
+            @test e1 ∨ e23 == 1
+            @test e2 ∨ e31 == 1
+            @test e3 ∨ e12 == 1
 
-            e123 ∨ e1 == e1
-            e123 ∨ e2 == e2
-            e123 ∨ e3 == e3
+            @test e123 ∨ e1 == e1
+            @test e123 ∨ e2 == e2
+            @test e123 ∨ e3 == e3
 
-            e123 ∨ e12 == e12
-            e123 ∨ e23 == e23
-            e123 ∨ e31 == e31
+            @test e123 ∨ e12 == e12
+            @test e123 ∨ e23 == e23
+            @test e123 ∨ e31 == e31
 
-            e123 ∨ e123 == e123
+            @test e123 ∨ e123 == e123
 
             @test 2 ∨ e1 == MultiVector(cl,2) ∨ e1
             @test 2 ∨ 3 == MultiVector(cl,2) ∨ MultiVector(cl,3)
         end
 
         @testset "commutator product" begin
-            1 ×₋ 2 == 0
-            2 ×₋ e1 == 0 
-            2 ×₋ e2 == 0 
-            2 ×₋ e3 == 0 
-            2 ×₋ e12 == 0 
-            2 ×₋ e23 == 0
-            2 ×₋ e31 == 0 
-            2 ×₋ e123 == 0 
+            @test 1 ×₋ 2 == 0
+            @test 2 ×₋ e1 == 0 
+            @test 2 ×₋ e2 == 0 
+            @test 2 ×₋ e3 == 0 
+            @test 2 ×₋ e12 == 0 
+            @test 2 ×₋ e23 == 0
+            @test 2 ×₋ e31 == 0 
+            @test 2 ×₋ e123 == 0 
 
-            e1 ×₋ e1 == 0
-            e2 ×₋ e2 == 0
-            e3 ×₋ e3 == 0
+            @test e1 ×₋ e1 == 0
+            @test e2 ×₋ e2 == 0
+            @test e3 ×₋ e3 == 0
 
-            e1 ×₋ e2 == -1
-            e1 ×₋ e3 == -1
-            e2 ×₋ e3 == -1
+            @test e1 ×₋ e2 == e12
+            @test e1 ×₋ e3 == -e31
+            @test e2 ×₋ e3 == e23
 
-            e12 ×₋ e12 == 0
-            e23 ×₋ e23 == 0
-            e31 ×₋ e31 == 0
+            @test e12 ×₋ e12 == 0
+            @test e23 ×₋ e23 == 0
+            @test e31 ×₋ e31 == 0
 
-            e23 ×₋ e12 == s2 * e31
-            e23 ×₋ e31 == s3 * e12
-            e12 ×₋ e31 == s1 * e23
+            @test e23 ×₋ e12 == s2 * e31
+            @test e23 ×₋ e31 == -s3 * e12
+            @test e12 ×₋ e31 == s1 * e23
 
-            e123 ×₋ e123 == 0
+            @test e123 ×₋ e123 == 0
         end
 
         @testset "anti-commutator product" begin
-            1 ×₊ 2 == 2
-            2 ×₊ e1 == e1 
-            2 ×₊ e2 == e2 
-            2 ×₊ e3 == e3
-            2 ×₊ e12 == e12 
-            2 ×₊ e23 == e23
-            2 ×₊ e31 == e31 
-            2 ×₊ e123 == e123 
+            @test 1 ×₊ 2 == 2
+            @test 2 ×₊ e1 == 2*e1 
+            @test 2 ×₊ e2 == 2*e2 
+            @test 2 ×₊ e3 == 2*e3
+            @test 2 ×₊ e12 == 2*e12 
+            @test 2 ×₊ e23 == 2*e23
+            @test 2 ×₊ e31 == 2*e31 
+            @test 2 ×₊ e123 == 2*e123 
 
-            e1 ×₊ e1 == s1
-            e2 ×₊ e2 == s2
-            e3 ×₊ e3 == s3
+            @test e1 ×₊ e1 == s1
+            @test e2 ×₊ e2 == s2
+            @test e3 ×₊ e3 == s3
 
-            e1 ×₊ e2 == 0
-            e1 ×₊ e3 == 0
-            e2 ×₊ e3 == 0
+            @test e1 ×₊ e2 == 0
+            @test e1 ×₊ e3 == 0
+            @test e2 ×₊ e3 == 0
 
-            e12 ×₊ e12 == s1 * s2
-            e23 ×₊ e23 == s2 * s3
-            e31 ×₊ e31 == s3 * s1
+            @test e12 ×₊ e12 == -s1 * s2
+            @test e23 ×₊ e23 == -s2 * s3
+            @test e31 ×₊ e31 == -s3 * s1
 
-            e23 ×₊ e12 == 0
-            e23 ×₊ e31 == 0
-            e12 ×₊ e31 == 0
+            @test e23 ×₊ e12 == 0
+            @test e23 ×₊ e31 == 0
+            @test e12 ×₊ e31 == 0
 
-            e123 ×₊ e123 == s1 * s2 * s3
+            @test e123 ×₊ e123 == -s1 * s2 * s3
         end
 
         @testset "sandwich product" for n = 1:100
@@ -449,6 +449,22 @@ import LinearAlgebra.SingularException
 
             @test exp(1 + e1 + e12 + e123) == exp(1 + e123) * exp(e1 + e12)
 
+            mv = 1 + e1 - e2 - e3 + e12 - e23 + e31 - e123
+            
+            M = [1 0 0; 0 1 0 ; 0 0 1]
+            @test outermorphism(M, mv) == mv
+
+            M = [0 0 0; 0 0 0 ; 0 0 0]
+            @test outermorphism(M, mv) == 1
+
+            M = [0 1 0; 1 0 0 ; 0 0 1]
+            @test outermorphism(M, mv) == 1 + e2 - e1 - e3 - e12 + e31 - e23 + e123
+
+            M = [0 0 1; 0 1 0 ; 1 0 0]
+            @test outermorphism(M, mv) == 1 + e3 - e2 - e1 - e23 + e12 - e31 + e123
+
+            M = [0 0 1; 0 1 0 ; 0 0 0]
+            @test outermorphism(M, mv) == 1 - e2 - e1 + e12
         end
 
     end
