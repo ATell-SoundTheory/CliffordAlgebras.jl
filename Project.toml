@@ -1,7 +1,7 @@
 name = "CliffordAlgebras"
 uuid = "ca841f6f-225c-4bbd-a467-7a3512dfa6f6"
 authors = ["Andreas Tell <atell@soundtheory.com> and contributors"]
-version = "0.1.2"
+version = "0.1.1"
 
 [deps]
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"

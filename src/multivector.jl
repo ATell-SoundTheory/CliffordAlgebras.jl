@@ -59,11 +59,37 @@ isone(mv::MultiVector) =
     isone(coefficients(mv)[1]) &&
     all(iszero.(coefficients(mv)[2:end]))
 
+    
 (==)(a::MultiVector, b::MultiVector) = false
 
-(==)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = vector(a) == vector(b)
+@generated function (==)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA}
+    bia = baseindices(a)
+    bib = baseindices(b)
+    bi = union(bia,bib)
+    cond = foldr( (exl,exr) -> Expr(:&&, exl, exr), (
+        begin
+            ka = findfirst(isequal(i), bia)
+            kb = findfirst(isequal(i), bib)
+            if isnothing(ka)
+                :(iszero(cb[$kb]))
+            elseif isnothing(kb)
+                :(iszero(ca[$ka]))
+            else
+                :(ca[$ka] == cb[$kb])
+            end
+        end
+        for i in bi
+    ))
+    quote
+        ca = coefficients(a)
+        cb = coefficients(b)
+        return $cond    
+    end
+end
 
-(==)(a::MultiVector{CA}, b::Real) where CA = a == MultiVector(CA,b)
+(==)(a::MultiVector{CA,Ta,BI}, b::MultiVector{CA,Tb,BI}) where {CA,Ta,Tb,BI} = coefficients(a) == coefficients(b)
+
+(==)(a::MultiVector{CA}, b::Real) where CA = a == MultiVector(CA, b)
 (==)(a::Real, b::MultiVector) = b == a
 
 

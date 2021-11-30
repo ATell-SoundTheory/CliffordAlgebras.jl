@@ -365,5 +365,5 @@ end
 
 function show(io::IO, ca::CliffordAlgebra)
     (Np, Nn, Nz) = signature(ca)
-    println(io, "Cl(", Np, ",", Nn, ",", Nz, ")")
+    print(io, "Cl(", Np, ",", Nn, ",", Nz, ")")
 end
