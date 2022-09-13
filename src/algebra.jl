@@ -329,7 +329,7 @@ function cayleytable(io::IO, CA::Type{<:CliffordAlgebra})
         table;
         show_row_number = false,
         crop = :none,
-        noheader = true,
+        show_header = false,
         alignment = :c,
         vlines = lines,
         hlines = lines,
@@ -358,7 +358,7 @@ function signaturetable(io::IO, CA::Type{<:CliffordAlgebra})
         table;
         show_row_number = false,
         crop = :none,
-        noheader = true,
+        show_header = false,
         alignment = :c
     )
 end
