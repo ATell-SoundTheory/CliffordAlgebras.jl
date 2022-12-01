@@ -207,7 +207,7 @@ baseproduct(ca::CliffordAlgebra, nleft::Integer, nright::Integer) = baseproduct(
     order(::CliffordAlgebra)
     order(::Type{<:CliffordAlgebra})
 
-Returns the order of the algebra. The order is the sum of the signature.
+Returns the order of the algebra. The order is the sum of the signature and the dimension of the underlying 1-vector space and the maximum grade for multivectors.
 """
 order(::Type{<:CliffordAlgebra{Np,Nn,Nz}}) where {Np,Nn,Nz} = Np + Nn + Nz
 order(ca::CliffordAlgebra) = order(typeof(ca))

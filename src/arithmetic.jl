@@ -658,7 +658,7 @@ Calculates the outermorphism f of the MultiVector defined by f(v) = Av if v is i
         return :(mv)
     else 
         nb = Expr(:call,:tuple)
-        append!(nb.args, [:(MultiVector(ca, Tuple(A[:,$(bv[i])]))) for i = 1:length(bv)])
+        append!(nb.args, [:(MultiVector(ca, Tuple(A[:,$(bv[i])]))) for i in eachindex(bv)])
         s = Expr(:call,:+)
         for (k,b) in enumerate(bt[collect(bi)])
             ft = map(n -> findfirst(isequal(n), bv) ,b)

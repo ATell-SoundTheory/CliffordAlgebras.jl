@@ -73,6 +73,16 @@ import LinearAlgebra.SingularException
         @test MultiVector(cl3, (1,2,3)).e3e1 == 0
         @test MultiVector(cl3, (1,2,3)).e1e2e3 == 0
 
+        @test coefficient(MultiVector(cl3, (1,2,3)), 1) == 0
+        @test coefficient(MultiVector(cl3, (1,2,3)), 2) == 1
+        @test coefficient(MultiVector(cl3, (1,2,3)), 3) == 2
+        @test coefficient(MultiVector(cl3, (1,2,3)), 4) == 3
+        @test coefficient(MultiVector(cl3, (1,2,3)), 5) == 0
+
+        @test coefficient(MultiVector(cl3, (1,2,3)), :e1) == 1
+        @test coefficient(MultiVector(cl3, (1,2,3)), :e2) == 2
+        @test coefficient(MultiVector(cl3, (1,2,3)), :e3) == 3
+
         @test_throws AssertionError MultiVector(cl3, (1,2))
 
         mv = 1 + cl3.e1 - cl3.e2 + cl3.e3 - cl3.e1e2 + cl3.e2e3 - cl3.e3e1 + cl3.e1e2e3
@@ -379,6 +389,9 @@ import LinearAlgebra.SingularException
             @test Λᵏ(mv,1) == grade(mv,1)
             @test Λᵏ(mv,2) == grade(mv,2)
             @test Λᵏ(mv,3) == grade(mv,3)
+
+            @test maxgrade(mv) == (grade(mv,3),3)
+            @test mingrade(mv) == (grade(mv,0),0)
 
             @test norm_sqr(e1) == s1
             @test norm_sqr(2*e2) == 4*s2

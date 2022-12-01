@@ -8,9 +8,10 @@ export cayleytable, signaturetable
 export MultiVector
 export zero, iszero, one, isone
 export ==, algebra, eltype
-export baseindices, coefficients
+export baseindices, coefficients, coefficient
 export scalar, prune, extend
-export grade, isgrade, reverse, ~
+export grade, isgrade, maxgrade, mingrade
+export reverse, ~
 export conj, grin, dual, even, odd
 export basevector, pseudoscalar
 export vector, matrix

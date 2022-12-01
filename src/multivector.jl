@@ -102,6 +102,36 @@ coefficients(mv::MultiVector) = getfield(mv,:c)
 
 
 """
+    coefficient(::MultiVector, n::Integer)
+
+Returns the multivector coefficients for the n-th basis vector. Returns 0 if n is out of bounds.
+"""
+function coefficient(mv::MultiVector{CA,T}, idx::Integer) where {CA,T}
+    n = findfirst(isequal(idx), baseindices(mv))
+    if isnothing(n) 
+        return zero(T)
+    else
+        return getfield(mv,:c)[n]
+    end
+end
+
+
+"""
+    coefficient(::MultiVector, s::Symbol)
+
+Returns the multivector coefficients for the basis vector belonging to the symbol s. Returns 0 if the symbol is not a valid basis symbol.
+"""
+function coefficient(mv::MultiVector{CA,T}, sym::Symbol) where {CA,T}
+    n = findfirst(i -> isequal(sym, basesymbol(CA,i)), baseindices(mv))
+    if isnothing(n) 
+        return zero(T)
+    else
+        return getfield(mv,:c)[n]
+    end
+end
+
+
+"""
     algebra(::MultiVector)
     algebra(::Type{<:MultiVector})
 
@@ -221,6 +251,35 @@ function grade(mv::MultiVector, k::Integer)
         MultiVector(Algebra(mv), baseindices(mv)[selector], coefficients(mv)[selector])
     end
 end
+
+
+"""
+    maxgrade(::MultiVector ; rtol = 1e-8)
+
+Projects the MultiVector onto the subspace of the largest grade with non-vanishing norm.
+Returns a tuple of the resulting multivector and its grade.
+"""
+function maxgrade(mv::MultiVector ; rtol = 1e-8)
+    ca = algebra(mv)
+    threshold = rtol * abs(maximum(coefficients(mv)))
+    kmax = maximum(basegrade(ca, i) for (i,c) in zip(baseindices(mv), coefficients(mv)) if abs(c) > threshold)
+    grade(mv, kmax), kmax
+end
+
+
+"""
+    mingrade(::MultiVector ; rtol = 1e-8)
+
+Projects the MultiVector onto the subspace of the largest grade with non-vanishing norm. 
+Returns a tuple of the resulting multivector and its grade.
+"""
+function mingrade(mv::MultiVector ; rtol = 1e-8)
+    ca = algebra(mv)
+    threshold = rtol * abs(maximum(coefficients(mv)))
+    kmax = minimum(basegrade(ca, i) for (i,c) in zip(baseindices(mv), coefficients(mv)) if abs(c) > threshold)
+    grade(mv, kmax), kmax
+end
+
 
 
 """

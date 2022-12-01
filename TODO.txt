@@ -1,0 +1,4 @@
+- Type based expression lazy evaluation for avoiding unnecesary calculations.
+- Make @generated functions normal function with 'if @generated' branch to allow for static compilation.
+- Investigate automatic sparseness decision depending on algebra size. 
+- Allow for user-specified (sparse) metric.
