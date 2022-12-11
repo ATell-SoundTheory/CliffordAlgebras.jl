@@ -26,7 +26,6 @@ import LinearAlgebra.SingularException
         @test CliffordAlgebra(:Grassmann2D) == CliffordAlgebra(:G2)
         @test CliffordAlgebra(:Grassmann3D) == CliffordAlgebra(:G3)
         @test CliffordAlgebra(:Quaternions) == CliffordAlgebra(:ℍ)
-        @test CliffordAlgebra(:Quaternions) == CliffordAlgebra(:ℍ)
         @test CliffordAlgebra(:Cl2) == CliffordAlgebra(2)
         @test CliffordAlgebra(:Cl3) == CliffordAlgebra(3)
         @test CliffordAlgebra(:Spacetime) == CliffordAlgebra(:STA)

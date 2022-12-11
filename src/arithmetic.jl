@@ -379,7 +379,15 @@ end
 
 Calculates the MultiVector norm defined as sqrt(grade(mv*reverse(mv),0))
 """
-norm(mv::MultiVector) = sqrt(norm_sqr(mv))
+function norm(mv::MultiVector{CA}) where CA
+    Nn = signature(CA)[2]
+    if Nn != 0
+        sqrt(complex(norm_sqr(mv)))
+    else
+        sqrt(norm_sqr(mv))
+    end
+end
+
 
 """
     norm_sqr(::MultiVector)
