@@ -202,7 +202,7 @@ Calculates the regressive product of the MultiVectors a and b.
 (∨)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = dual(dual(a) ∧ dual(b))
 (∨)(a::MultiVector{CA}, b::Real) where {CA} = a ∨ MultiVector(CA,b)
 (∨)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ∨ b
-(∨)(a::Real, b::Real) where {CA} = zero(promote_type(typeof(a),typeof(b)))
+(∨)(a::Real, b::Real) = zero(promote_type(typeof(a),typeof(b)))
 
 
 function generatesymprod(
