@@ -3,7 +3,20 @@ using Test
 import LinearAlgebra.SingularException
 
 @testset "CliffordAlgebras.jl" begin
-
+    @testset "isapprox" begin
+        Cl = CliffordAlgebra
+        @test Cl(1,1,1).e1 ≈ Cl(1,1,1).e1
+        @test !(Cl(2,0,1).e1 ≈ Cl(1,1,1).e1)
+        @test !(Cl(1,0,0).e1 ≈ Cl(1,1,1).e1)
+        alg = Cl(3,0,0)
+        @test alg.e1 ≈ alg.e1
+        @test !(alg.e1 ≈ alg.e1 + 1e-6)
+        @test alg.e1 ≈ alg.e1 + 1e-15
+        @test !isapprox(alg.e1, alg.e1 + 1e-6, atol=1e-8)
+        @test alg.e1 ≈ (alg.e1 + 1e-6) atol = 2e-6
+        @test !isapprox(alg.e1, alg.e1 + 1e-6, rtol=1e-8)
+        @test alg.e1 ≈ (alg.e1 + 1e-6) rtol = 2e-6
+    end
     @testset "Algebra" begin
         @test CliffordAlgebra(1,0,0) == CliffordAlgebra(1)
         @test CliffordAlgebra(0,1,0) == CliffordAlgebra(0,1)
@@ -477,8 +490,14 @@ import LinearAlgebra.SingularException
 
             M = [0 0 1; 0 1 0 ; 0 0 0]
             @test outermorphism(M, mv) == 1 - e2 - e1 + e12
+
+            @test !(e1 ≈ e2)
+            @test e1 ≈ e1
+            @test !(e1 ≈ 1.00001*e1)
+            @test e1 ≈ 1.00001*e1 atol = 0.001
+            @test !(e2 ≈ e2 + 1e-6*e12)
+            @test (e2 ≈ e2 + 1e-8*e12)
         end
 
     end
-    
 end

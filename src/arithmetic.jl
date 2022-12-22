@@ -388,6 +388,31 @@ function norm(mv::MultiVector{CA}) where CA
     end
 end
 
+function default_atol(mv1, mv2)
+    T = promote_type(eltype(mv1), eltype(mv2))
+    zero(T)
+end
+function default_rtol(mv1, mv2)
+    T = promote_type(eltype(mv1), eltype(mv2))
+    sqrt(eps(float(T)))
+end
+
+"""
+    isapprox(mv1::MultiVector, mv2::MultiVector; kw...)
+
+Check if `mv1` and `mv2` belong to the same algebra and their coefficients
+are close.
+"""
+function Base.isapprox(mv1::MultiVector, mv2::MultiVector; 
+        atol=default_atol(mv1, mv2),
+        rtol=default_rtol(mv1, mv2),
+)
+    algebra(mv1) === algebra(mv2) || return false
+    n1 = norm(coefficients(mv1))
+    n2 = norm(coefficients(mv2))
+    n12 = norm(coefficients(mv1 - mv2))
+    n12 < max(atol, rtol*max(n1,n2))
+end
 
 """
     norm_sqr(::MultiVector)
