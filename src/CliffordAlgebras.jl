@@ -7,7 +7,7 @@ export cayleytable, signaturetable
 
 export MultiVector
 export zero, iszero, one, isone
-export ==, algebra, eltype
+export ==, algebra, eltype, isapprox
 export baseindices, coefficients, coefficient
 export scalar, prune, extend
 export grade, isgrade, maxgrade, mingrade
