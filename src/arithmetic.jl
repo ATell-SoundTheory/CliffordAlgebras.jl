@@ -666,20 +666,24 @@ end
 
 
 function exp_trig(mv::MultiVector)
-    if iszero(mv)
-        return one(mv)
+    T = float(eltype(mv))
+    x2 = sum(coefficients(mv) .^ 2, init=zero(T))
+    if iszero(x2)
+        one(T) + zero(T)*mv
     else
-        x = sqrt(sum(coefficients(mv) .^ 2))
-        return cos(x) + sin(x) * mv * inv(x)
+        x = sqrt(x2)
+        s,c = sincos(x)
+        c + s * mv * inv(x)
     end
 end
 
-
 function exp_hyp(mv::MultiVector)
-    if iszero(mv)
-        return one(mv)
+    T = float(eltype(mv))
+    x2 = sum(coefficients(mv) .^ 2, init=zero(T))
+    if iszero(x2)
+        return one(T) + zero(T) * mv
     else
-        x = sqrt(sum(coefficients(mv) .^ 2))
+        x = sqrt(x2)
         return cosh(x) + sinh(x) * mv * inv(x)
     end
 end

@@ -2,7 +2,7 @@ using CliffordAlgebras
 using Test
 import LinearAlgebra.SingularException
 
-# @testset "CliffordAlgebras.jl" begin
+@testset "CliffordAlgebras.jl" begin
     @testset "inference" begin
         alg = CliffordAlgebra(1,1,1)
         @inferred 3*alg.e1
@@ -19,6 +19,24 @@ import LinearAlgebra.SingularException
         @inferred scalar(3*alg.e1)
         @inferred reverse(alg.e1 + 3*alg.e1e2)
         @inferred norm(alg.e1 + 3*alg.e1e2)
+
+        @testset "inference pga3d" begin
+            pga = CliffordAlgebra(3,0,1)
+            pt  = @inferred dual(pga.e4 + 3.2pga.e1 + 1.3pga.e2-4.3pga.e3)
+            pt1 = @inferred dual(pga.e4 + pga.e1)
+            pt2 = @inferred dual(pga.e4 + pga.e2 - pga.e3)
+            l = @inferred ∨(pt1, pt2)
+            l = @inferred l / norm(l)
+            motor1 = @inferred exp(-pi/6*l)
+            motor2 = @inferred exp(-1/2*pga.e3e4)
+            motor = @inferred motor1 * motor2
+
+            @inferred ≀(motor, pt)
+            @inferred ≀(motor1, pt)
+            @inferred ≀(motor2, pt)
+            @inferred ≀(motor, l)
+            @inferred ≀(motor, motor1)
+        end
     end
 
     @testset "isapprox" begin
@@ -497,6 +515,7 @@ import LinearAlgebra.SingularException
             end
 
             for mv in (e1, e2, e3, e12, e23, e31, e123)
+                @inferred exp(mv)
                 if scalar(mv*mv) < 0
                     @test exp(mv) == cos(1) + sin(1) * mv
                 elseif scalar(mv*mv) > 0
@@ -505,6 +524,7 @@ import LinearAlgebra.SingularException
                     @test exp(mv) == 1 + mv
                 end
                 @test convert(Float32,exp(mv) * exp(-mv)) ≈ 1
+                @test exp(0*mv) == 1
             end
 
             @test exp(1 + e1 + e12 + e123) == exp(1 + e123) * exp(e1 + e12)
@@ -535,4 +555,4 @@ import LinearAlgebra.SingularException
         end
 
     end
-# end
+end
