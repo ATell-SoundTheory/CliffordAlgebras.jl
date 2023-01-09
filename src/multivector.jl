@@ -13,15 +13,15 @@ Coefficients are stored using a sparse coding, and only the coefficients of the 
 """
 struct MultiVector{CA,T,BI,K}
     c::NTuple{K,T}
-    function MultiVector(
-        CA::Type{<:CliffordAlgebra},
-        BI::NTuple{K,Integer},
-        c::NTuple{K,T},
-    ) where {K,T<:Real}
-        @assert length(BI) > 0 
-        #@assert issorted(BI) && allunique(BI)
-        new{CA,T,convert(NTuple{K,Int}, BI),K}(c)
-    end
+end
+function MultiVector(
+    CA::Type{<:CliffordAlgebra},
+    BI::NTuple{K,Integer},
+    c::NTuple{K,T},
+) where {K,T<:Real}
+    @assert length(BI) > 0 
+    #@assert issorted(BI) && allunique(BI)
+    MultiVector{CA,T,convert(NTuple{K,Int}, BI),K}(c)
 end
 
 """
@@ -30,7 +30,11 @@ end
 
 Creates a MultiVector from the real number a with only a scalar component. The internal storage type of the MultiVector is the type of a.
 """
-MultiVector(CA::Type{<:CliffordAlgebra}, a::T) where {T<:Real} = MultiVector(CA, (1,), (a,))
+function MultiVector(CA::Type{<:CliffordAlgebra}, a::T) where {T<:Real}
+    BI = (1,)
+    K = 1
+    MultiVector{CA,T,BI,K}((a,))
+end
 MultiVector(ca::CliffordAlgebra, a::T) where {T<:Real} = MultiVector(typeof(ca), a)
 
 """
@@ -336,20 +340,26 @@ grin(mv::MultiVector) = even(mv) - odd(mv)
 
 Returns the Poincaré dual of the MultiVector, such that for all basis MultiVectors mv * dual(mv) = pseudoscalar. Dual is a linear map and the images of other MultiVectors follow from the images of the basis MultiVectors.
 """
-dual(mv::MultiVector{CA,T,BI,K}) where {CA,T,BI,K} =
-    MultiVector(CA, dimension(CA) + 1 .- BI[end:-1:1], coefficients(mv)[end:-1:1])
+function dual(mv::MultiVector)
+    MV = typeof_dual(mv)
+    MV(Base.reverse(coefficients(mv)))
+end
+
+@generated function typeof_dual(::MultiVector{CA, T, BI,K}) where {CA, T, BI, K}
+    DualBI = dimension(CA) + 1 .- Base.reverse(BI)
+    :(MultiVector{$CA,$T,$DualBI,$K})
+end
 
 """
     reverse(::MultiVector)
 
 Returns the MultiVector that has all the basis vector products reversed.
 """
-function reverse(mv::MultiVector)
+function reverse(mv::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
     # Reverses the order of the canonical basis products
-    CA = Algebra(mv)
-    BI = baseindices(mv)
     s = map(n -> basereverse(CA, n), BI)
-    MultiVector(CA, BI, coefficients(mv) .* s)
+    new_coeffs = coefficients(mv) .* s
+    MultiVector{CA,T,BI,K}(new_coeffs)
 end
 
 """

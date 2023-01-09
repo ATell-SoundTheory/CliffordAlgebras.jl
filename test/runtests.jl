@@ -2,7 +2,25 @@ using CliffordAlgebras
 using Test
 import LinearAlgebra.SingularException
 
-@testset "CliffordAlgebras.jl" begin
+# @testset "CliffordAlgebras.jl" begin
+    @testset "inference" begin
+        alg = CliffordAlgebra(1,1,1)
+        @inferred 3*alg.e1
+        @inferred 3.0*alg.e1
+        @inferred alg.e1*3f0
+        @inferred (3alg.e1) * (alg.e2)
+        @inferred alg.e1 ∧ 2.3
+    
+        @inferred dual(alg.e1)
+        @inferred dual(alg.e1 + alg.e1e2)
+        @inferred alg.e1 ∨ (alg.e2e3 + 1)
+    
+        @inferred scalar(alg.e1)
+        @inferred scalar(3*alg.e1)
+        @inferred reverse(alg.e1 + 3*alg.e1e2)
+        @inferred norm(alg.e1 + 3*alg.e1e2)
+    end
+
     @testset "isapprox" begin
         Cl = CliffordAlgebra
         @test Cl(1,1,1).e1 ≈ Cl(1,1,1).e1
@@ -319,6 +337,11 @@ import LinearAlgebra.SingularException
 
             @test 2 ∨ e1 == MultiVector(cl,2) ∨ e1
             @test 2 ∨ 3 == MultiVector(cl,2) ∨ MultiVector(cl,3)
+
+            @test 1 ∨ 2 == 0
+            @test e1 ∨ 2 == 0
+            @test e12 ∨ 2 == 0
+            @test e123 ∨ 2 == 2
         end
 
         @testset "commutator product" begin
@@ -394,6 +417,16 @@ import LinearAlgebra.SingularException
             @test mva ≀ mvb == mva * mvb * reverse(mva)
         end
 
+        @testset "norm" begin
+            r = -100:100
+            mv  = rand(r) + rand(r) * e1 + 
+                  rand(r) * e2 + rand(r) * e3 + 
+                  rand(r) * e12 + rand(r) * e23 +
+                  rand(r) * e31 + rand(r) * e123
+            
+            @test norm(mv) ≈ sqrt(Complex(scalar(mv*reverse(mv))))
+        end
+
         @testset "misc functions" begin
             mv = 1 + e1 - e2 + e3 + e12 - e23 + e31 - e123
             @test polarize(mv)*pseudoscalar(algebra(mv)) == character(algebra(mv))
@@ -415,6 +448,8 @@ import LinearAlgebra.SingularException
 
             @test norm(2*e1) == 2*s1
             @test norm(-2*e1) == 2*s1
+
+            @test norm(e1+2*e31) ≈ sqrt(norm(e1)^2 + 2*norm(e31))
 
             if !iszero(s1)
                 @test inv(e1) * e1 == e1 * inv(e1) == 1 
@@ -500,4 +535,4 @@ import LinearAlgebra.SingularException
         end
 
     end
-end
+# end

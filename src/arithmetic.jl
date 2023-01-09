@@ -28,13 +28,13 @@ import SparseArrays.sparse, SparseArrays.sparsevec
         n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector{$CA,$T,$BI,$K}($coeffsexpr))
 end
 
 (+)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA, a) + b
 (+)(a::MultiVector{CA}, b::Real) where {CA} = a + MultiVector(CA, b)
 
-(-)(a::MultiVector) = -1 * a
+(-)(a::MultiVector) = map_coefficients(-, a)
 (-)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = a + (-b)
 (-)(a::Real, b::MultiVector) = a + (-b)
 (-)(a::MultiVector, b::Real) = a + (-b)
@@ -85,7 +85,7 @@ function generatefilteredprod(
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector{$CA,$T,$BI,$K}($coeffsexpr))
 end
 
 @generated function geometricprod(
@@ -137,8 +137,18 @@ end
 Calculates the geometric product of two MultiVectors a and b.
 """
 (*)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = geometricprod(a, b)
-(*)(a::Real, b::MultiVector) = MultiVector(Algebra(b), baseindices(b), a .* coefficients(b))
-(*)(a::MultiVector, b::Real) = b * a
+(*)(a::Real, b::MultiVector) = mul_with_scalar(a,b)
+(*)(a::MultiVector, b::Real) = mul_with_scalar(b,a)
+
+function map_coefficients(f, mv::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
+    new_coeffs = map(f, coefficients(mv))
+    T_new = eltype(new_coeffs)
+    MultiVector{CA,T_new, BI, K}(new_coeffs)
+end
+
+function mul_with_scalar(s::Real,mv::MultiVector)
+    map_coefficients(x->s*x,mv)
+end
 
 """
     a ∧ b
@@ -146,8 +156,8 @@ Calculates the geometric product of two MultiVectors a and b.
 Calculates the wedge product between two MultiVectors a and b.
 """
 (∧)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = exteriorprod(a, b)
-(∧)(a::MultiVector{CA}, b::Real) where {CA} = a ∧ MultiVector(CA,b)
-(∧)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ∧ b
+(∧)(a::MultiVector{CA}, b::Real) where {CA} = mul_with_scalar(b,a)
+(∧)(a::Real, b::MultiVector{CA}) where {CA} = mul_with_scalar(a,b)
 (∧)(a::Real, b::Real) = a * b
 
 
@@ -157,8 +167,8 @@ Calculates the wedge product between two MultiVectors a and b.
 Calculates the "fat dot" product between the MultiVectors a and b.
 """
 (⋅)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = fatdotprod(a, b)
-(⋅)(a::MultiVector{CA}, b::Real) where {CA} = a ⋅ MultiVector(CA,b)
-(⋅)(a::Real, b::MultiVector{CA}) where {CA} = MultiVector(CA,a) ⋅ b
+(⋅)(a::MultiVector{CA}, b::Real) where {CA} = mul_with_scalar(b,a)
+(⋅)(a::Real, b::MultiVector{CA}) where {CA} = mul_with_scalar(a,b)
 (⋅)(a::Real, b::Real) = a * b
 
 
@@ -327,7 +337,7 @@ end
 """
     a ≀ b
 
-Calculates the sandwich product a*b*reverse(a) for two MultiVectors a and b.
+Calculates the sandwich product `a*b*reverse(a)` for two MultiVectors a and b.
 """
 (≀)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = sandwichproduct(a, b)
 (≀)(a::Real, b::MultiVector{CA}) where {CA} = a^2 * b
@@ -339,7 +349,7 @@ Calculates the sandwich product a*b*reverse(a) for two MultiVectors a and b.
     polarize(mv::MultiVector)
     mv'
 
-Calculates the polarization of the MultiVector, i.e. mv * pseudoscalar.
+Calculates the polarization of the MultiVector, i.e. `mv * pseudoscalar`.
 """
 polarize(mv::MultiVector{CA}) where {CA} = mv * pseudoscalar(CA)
 
@@ -377,7 +387,7 @@ end
 """
     norm(::MultiVector)
 
-Calculates the MultiVector norm defined as sqrt(grade(mv*reverse(mv),0))
+Calculates the MultiVector norm defined as `sqrt(scalar(mv*reverse(mv)))`.
 """
 function norm(mv::MultiVector{CA}) where CA
     Nn = signature(CA)[2]
@@ -419,8 +429,30 @@ end
 
 Calculates the MultiVector squared norm defined as grade(mv*reverse(mv),0)
 """
-norm_sqr(mv::MultiVector) = scalar(Λᵏ(mv * reverse(mv), 0))
+@generated function norm_sqr(mv::MultiVector{CA,T,BI,K}) where {CA,T,BI,K}
+    bt = basetable(CA)
+    terms = Expr[]
+    for i in 1:K
+        sign = baseblade_sqr(CA, bt[BI[i]])
+        if !iszero(sign)
+            term = :($sign*c[$i]^2)
+            push!(terms, term)
+        end
+    end
+    if isempty(terms)
+        return :(zero($T))
+    end
+    quote
+        c = coefficients(mv)
+        +($(terms...))
+    end
+end
 
+function baseblade_sqr(CA::Type{<:CliffordAlgebra}, x::NTuple)::Int
+    prod(x, init=1) do i
+        basesignature(CA,i)
+    end
+end
 
 """
     inv(::MultiVector)
@@ -578,7 +610,7 @@ Calculates the MultiVector quotient a/b by evaluating inv(b)*a.
     exp(::MultiVector)
 
 Calculates the exponential function of the MultiVector defined by analytic continuation.
-The generated code is automaticall specialized for the sparse representation of the MultiVector.
+The generated code is automatically specialized for the sparse representation of the MultiVector.
 It may take advantage of commuting base vectors and split off exponential factors. Hyperbolic, trigonometric and nilpotent solutions are recognized and handled separately.
 Calling prune or grade before exp may help to find the best algorithm for the exponential evaluation.
 """
