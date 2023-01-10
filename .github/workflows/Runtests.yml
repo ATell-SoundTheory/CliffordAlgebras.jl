@@ -2,7 +2,7 @@ name: Runtests
 on: [push, pull_request]
 jobs:
   test:
-    name: "Runtests ${{julia-version}}"
+    name: "Runtests ${{matrix.julia-version}}"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
