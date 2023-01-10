@@ -331,7 +331,7 @@ Calculates the anti-commutator ab+ba of two MultiVectors a and b.
         ) for n in BI
     )
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(@inbounds MultiVector(Algebra(a), $BI, $coeffsexpr))
+    :(@inbounds MultiVector{$CA,$T,$BI,$K}($coeffsexpr))
 end
 
 """
