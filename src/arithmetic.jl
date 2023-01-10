@@ -664,28 +664,22 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
     :(@inbounds $prodexpr)
 end
 
+function inv0(x)
+    y = inv(x)
+    ifelse(iszero(x), zero(y), y)
+end
 
 function exp_trig(mv::MultiVector)
     T = float(eltype(mv))
-    x2 = sum(coefficients(mv) .^ 2, init=zero(T))
-    if iszero(x2)
-        one(T) + zero(T)*mv
-    else
-        x = sqrt(x2)
-        s,c = sincos(x)
-        c + s * mv * inv(x)
-    end
+    x = sqrt(sum(coefficients(mv) .^ 2, init=zero(T)))
+    s,c = sincos(x)
+    return c + s * mv * inv0(x)
 end
 
 function exp_hyp(mv::MultiVector)
     T = float(eltype(mv))
-    x2 = sum(coefficients(mv) .^ 2, init=zero(T))
-    if iszero(x2)
-        return one(T) + zero(T) * mv
-    else
-        x = sqrt(x2)
-        return cosh(x) + sinh(x) * mv * inv(x)
-    end
+    x = sqrt(sum(coefficients(mv) .^ 2, init=zero(T)))
+    return cosh(x) + sinh(x) * mv * inv0(x)
 end
 
 
