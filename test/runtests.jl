@@ -1,8 +1,6 @@
 using CliffordAlgebras
 using Test
 import LinearAlgebra.SingularException
-
-@testset "CliffordAlgebras.jl" begin
     @testset "inference pga3d" begin
         pga = CliffordAlgebra(3,0,1)
         pt  = @inferred dual(pga.e4 + 3.2pga.e1 + 1.3pga.e2-4.3pga.e3)
@@ -16,12 +14,20 @@ import LinearAlgebra.SingularException
         motor2 = @inferred exp(-1/2*pga.e3e4)
         motor = @inferred motor1 * motor2
 
+        @inferred Λᵏ(motor, Val(0))
+        @inferred Λᵏ(motor, Val(1))
+        @inferred Λᵏ(motor, Val(2))
+        @inferred Λᵏ(motor, Val(3))
+        @inferred Λᵏ(motor, Val(4))
+
         @inferred ≀(motor, pt)
         @inferred ≀(motor1, pt)
         @inferred ≀(motor2, pt)
         @inferred ≀(motor, l)
         @inferred ≀(motor, motor1)
     end
+
+@testset "CliffordAlgebras.jl" begin
 
     @testset "isapprox" begin
         Cl = CliffordAlgebra

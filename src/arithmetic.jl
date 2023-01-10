@@ -376,10 +376,10 @@ Projects the MultiVector onto k-vectors. Similar to grade(mv,k), but uses
     T = eltype(mv)
     coeffs = (:(coefficients(mv)[$i]) for i in s)
     if length(coeffs) == 0
-        return :(MultiVector(Algebra(a), zero($T)))
+        return :(MultiVector($CA, zero($T)))
     end
     coeffsexpr = Expr(:call, :(NTuple{$K,$T}), Expr(:call, :tuple, coeffs...))
-    :(@inbounds MultiVector(Algebra(mv), $BI, $coeffsexpr))
+    :(@inbounds MultiVector{$CA,$T,$BI,$K}($coeffsexpr))
 end
 
 (Λᵏ)(mv::MultiVector, k::Integer) = Λᵏ(mv, Val(k))
