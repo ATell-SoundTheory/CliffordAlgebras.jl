@@ -11,6 +11,7 @@ import LinearAlgebra.SingularException
         l = @inferred ∨(pt1, pt2)
         @inferred norm(l)
         l = @inferred l / norm(l)
+        @inferred CliffordAlgebras.exp_trig(-pi/6*l)
         motor1 = @inferred exp(-pi/6*l)
         motor2 = @inferred exp(-1/2*pga.e3e4)
         motor = @inferred motor1 * motor2

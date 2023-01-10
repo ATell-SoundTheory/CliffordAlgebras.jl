@@ -614,7 +614,11 @@ The generated code is automatically specialized for the sparse representation of
 It may take advantage of commuting base vectors and split off exponential factors. Hyperbolic, trigonometric and nilpotent solutions are recognized and handled separately.
 Calling prune or grade before exp may help to find the best algorithm for the exponential evaluation.
 """
+
 @generated function exp(mv::MultiVector)
+    expr_exp(mv)
+end
+function expr_exp(::Type{mv}) where {mv <: MultiVector}
     # 1. Identify (optimal) subsets of base vectors so that all vectors in such a set commute with all vectors outside the set. 
     ca = algebra(mv)
     bi = baseindices(mv)
@@ -636,8 +640,14 @@ Calling prune or grade before exp may help to find the best algorithm for the ex
             push!(prodexpr.args, :(exp(scalar(mv))))
         else
             baseselector = Tuple([findfirst(isequal(i), bi) for i in ncset])
-            coeftuple = Expr(:call, :tuple, map(i -> :(coefficients(mv)[$i]), baseselector)...)
-            ncsetmvexpr = :(MultiVector(Algebra(mv), $(Tuple(ncset)), $coeftuple))
+            coeftuple = Expr(:tuple, map(i -> :(coefficients(mv)[$i]), baseselector)...)
+            ncsetmvexpr = let
+                CA = Algebra(mv) 
+                BI = Tuple(ncset)
+                K = length(BI)
+                T = eltype(mv)
+                :(MultiVector{$CA, $T, $BI, $K}($coeftuple))
+            end
             basesquares = [baseproduct(ca, i, i)[2] for i in ncset]
             crosstermscancel =
                 all(iszero(baseproduct(ca, i, j)[2] + baseproduct(ca, j, i)[2]) for i in ncset, j in ncset if i < j)
