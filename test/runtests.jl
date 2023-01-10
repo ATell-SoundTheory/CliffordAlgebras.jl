@@ -19,6 +19,7 @@ import LinearAlgebra.SingularException
         @inferred Λᵏ(motor, Val(2))
         @inferred Λᵏ(motor, Val(3))
         @inferred Λᵏ(motor, Val(4))
+        @inferred extend(motor)
 
         @inferred ≀(motor, pt)
         @inferred ≀(motor1, pt)

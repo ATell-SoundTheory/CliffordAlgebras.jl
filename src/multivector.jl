@@ -222,12 +222,12 @@ end
 
 Returns a new MultiVector with a non-sparse coefficient coding. This can be useful to manage type stability.
 """
-@generated function extend(mv::MultiVector{CA}) where CA
+@generated function extend(mv::MultiVector{CA,T}) where {CA,T}
     bi = baseindices(mv)
     d = dimension(CA)
     T = eltype(mv)
-    bexpr = Expr(:call,:tuple)
-    cexpr = Expr(:call,:tuple)
+    bexpr = Expr(:tuple)
+    cexpr = Expr(:tuple)
     for k = 1:d
         push!(bexpr.args, k)
         n = findfirst(isequal(k), bi)
@@ -237,7 +237,8 @@ Returns a new MultiVector with a non-sparse coefficient coding. This can be usef
             push!(cexpr.args, :(coefficients(mv)[$n]))
         end
     end
-    :(@inbounds MultiVector(CA, $bexpr, $cexpr))
+    K = length(bexpr.args)
+    :(@inbounds MultiVector{CA, $T, $bexpr, $K}($cexpr))
 end
 
 

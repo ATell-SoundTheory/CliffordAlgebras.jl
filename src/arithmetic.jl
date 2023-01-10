@@ -363,8 +363,7 @@ adjoint(mv::MultiVector) = polarize(mv)
 Projects the MultiVector onto k-vectors. Similar to grade(mv,k), but uses
 @generated code and compile time optimizations.
 """
-@generated function (Λᵏ)(mv::MultiVector, ::Val{k}) where {k}
-    CA = algebra(mv)
+@generated function (Λᵏ)(mv::MultiVector{CA}, ::Val{k}) where {CA,k}
     indexbounds =
         1 .+ (0, cumsum(ntuple(i -> binomial(order(CA), i - 1), 1 + order(CA)))...)
     @assert 0 < k + 1 < length(indexbounds) "k out of bounds."
