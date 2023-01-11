@@ -1,8 +1,35 @@
 using CliffordAlgebras
 using Test
 import LinearAlgebra.SingularException
+    @testset "inference pga3d" begin
+        pga = CliffordAlgebra(3,0,1)
+        pt  = @inferred dual(pga.e4 + 3.2pga.e1 + 1.3pga.e2-4.3pga.e3)
+        pt1 = @inferred dual(pga.e4 + pga.e1)
+        pt2 = @inferred dual(pga.e4 + pga.e2 - pga.e3)
+        l = @inferred ∨(pt1, pt2)
+        @inferred norm(l)
+        l = @inferred l / norm(l)
+        @inferred CliffordAlgebras.exp_trig(-pi/6*l)
+        motor1 = @inferred exp(-pi/6*l)
+        motor2 = @inferred exp(-1/2*pga.e3e4)
+        motor = @inferred motor1 * motor2
+
+        @inferred Λᵏ(motor, Val(0))
+        @inferred Λᵏ(motor, Val(1))
+        @inferred Λᵏ(motor, Val(2))
+        @inferred Λᵏ(motor, Val(3))
+        @inferred Λᵏ(motor, Val(4))
+        @inferred extend(motor)
+
+        @inferred ≀(motor, pt)
+        @inferred ≀(motor1, pt)
+        @inferred ≀(motor2, pt)
+        @inferred ≀(motor, l)
+        @inferred ≀(motor, motor1)
+    end
 
 @testset "CliffordAlgebras.jl" begin
+
     @testset "isapprox" begin
         Cl = CliffordAlgebra
         @test Cl(1,1,1).e1 ≈ Cl(1,1,1).e1
@@ -175,6 +202,24 @@ import LinearAlgebra.SingularException
         s2 = scalar(e2*e2)
         s3 = scalar(e3*e3)
 
+        @testset "inference" begin
+            @inferred 3*e1
+            @inferred 3.0*e1
+            @inferred e1*3f0
+            @inferred (3e1) * (e2)
+            @inferred e1 ∧ 2.3
+            @inferred -e1
+        
+            @inferred dual(e1)
+            @inferred dual(e1 + e12)
+            @inferred e1 ∨ (e23 + 1)
+        
+            @inferred scalar(e1)
+            @inferred scalar(3*e1)
+            @inferred reverse(e1 + 3*e12)
+            @inferred norm(e1 + 3*e12)
+        end
+
         @testset "addition/subtraction" begin
             @test e1 + e2 == e2 + e1
             @test e1 - e2 == -(e2 - e1)
@@ -319,6 +364,11 @@ import LinearAlgebra.SingularException
 
             @test 2 ∨ e1 == MultiVector(cl,2) ∨ e1
             @test 2 ∨ 3 == MultiVector(cl,2) ∨ MultiVector(cl,3)
+
+            @test 1 ∨ 2 == 0
+            @test e1 ∨ 2 == 0
+            @test e12 ∨ 2 == 0
+            @test e123 ∨ 2 == 2
         end
 
         @testset "commutator product" begin
@@ -394,6 +444,16 @@ import LinearAlgebra.SingularException
             @test mva ≀ mvb == mva * mvb * reverse(mva)
         end
 
+        @testset "norm" begin
+            r = -100:100
+            mv  = rand(r) + rand(r) * e1 + 
+                  rand(r) * e2 + rand(r) * e3 + 
+                  rand(r) * e12 + rand(r) * e23 +
+                  rand(r) * e31 + rand(r) * e123
+            
+            @test norm(mv) ≈ sqrt(Complex(scalar(mv*reverse(mv))))
+        end
+
         @testset "misc functions" begin
             mv = 1 + e1 - e2 + e3 + e12 - e23 + e31 - e123
             @test polarize(mv)*pseudoscalar(algebra(mv)) == character(algebra(mv))
@@ -415,6 +475,8 @@ import LinearAlgebra.SingularException
 
             @test norm(2*e1) == 2*s1
             @test norm(-2*e1) == 2*s1
+
+            @test norm(e1+2*e31) ≈ sqrt(norm(e1)^2 + 2*norm(e31))
 
             if !iszero(s1)
                 @test inv(e1) * e1 == e1 * inv(e1) == 1 
@@ -462,6 +524,7 @@ import LinearAlgebra.SingularException
             end
 
             for mv in (e1, e2, e3, e12, e23, e31, e123)
+                @inferred exp(mv)
                 if scalar(mv*mv) < 0
                     @test exp(mv) == cos(1) + sin(1) * mv
                 elseif scalar(mv*mv) > 0
@@ -470,6 +533,7 @@ import LinearAlgebra.SingularException
                     @test exp(mv) == 1 + mv
                 end
                 @test convert(Float32,exp(mv) * exp(-mv)) ≈ 1
+                @test exp(0*mv) == 1
             end
 
             @test exp(1 + e1 + e12 + e123) == exp(1 + e123) * exp(e1 + e12)
