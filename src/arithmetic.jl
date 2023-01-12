@@ -422,6 +422,14 @@ function Base.isapprox(mv1::MultiVector, mv2::MultiVector;
     n12 = norm(coefficients(mv1 - mv2))
     n12 < max(atol, rtol*max(n1,n2))
 end
+function Base.isapprox(mv::MultiVector, x::Real; kw...)
+    CA = Algebra(mv)
+    isapprox(mv, MultiVector(CA,x); kw...)
+end
+function Base.isapprox(x::Real, mv::MultiVector; kw...)
+    CA = Algebra(mv)
+    isapprox(mv, MultiVector(CA,x); kw...)
+end
 
 """
     norm_sqr(::MultiVector)
