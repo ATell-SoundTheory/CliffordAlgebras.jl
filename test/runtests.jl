@@ -196,7 +196,6 @@ import LinearAlgebra.SingularException
             CliffordAlgebra(1,1,1)
         ) 
 
-        # cl = CliffordAlgebra(1,1,1)
         e1 = cl.e1
         e2 = cl.e2
         e3 = cl.e3
