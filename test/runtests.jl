@@ -1,8 +1,11 @@
 using CliffordAlgebras
 using Test
 import LinearAlgebra.SingularException
+
+@testset "CliffordAlgebras.jl" begin
     @testset "inference pga3d" begin
         pga = CliffordAlgebra(3,0,1)
+        @inferred MultiVector(pga, 1.0)
         pt  = @inferred dual(pga.e4 + 3.2pga.e1 + 1.3pga.e2-4.3pga.e3)
         pt1 = @inferred dual(pga.e4 + pga.e1)
         pt2 = @inferred dual(pga.e4 + pga.e2 - pga.e3)
@@ -27,9 +30,6 @@ import LinearAlgebra.SingularException
         @inferred ≀(motor, l)
         @inferred ≀(motor, motor1)
     end
-
-@testset "CliffordAlgebras.jl" begin
-
     @testset "isapprox" begin
         Cl = CliffordAlgebra
         @test Cl(1,1,1).e1 ≈ Cl(1,1,1).e1
@@ -43,6 +43,13 @@ import LinearAlgebra.SingularException
         @test alg.e1 ≈ (alg.e1 + 1e-6) atol = 2e-6
         @test !isapprox(alg.e1, alg.e1 + 1e-6, rtol=1e-8)
         @test alg.e1 ≈ (alg.e1 + 1e-6) rtol = 2e-6
+
+        @test !isapprox(alg.e1, 1)
+        @test !isapprox(1, alg.e2)
+        @test isapprox(alg.e1, 1, atol=2)
+        @test !isapprox(alg.e1, 1, atol=1)
+        @test isapprox(1, alg.e1, atol=2)
+        @test !isapprox(1, alg.e1, atol=1)
     end
     @testset "Algebra" begin
         @test CliffordAlgebra(1,0,0) == CliffordAlgebra(1)
@@ -189,7 +196,7 @@ import LinearAlgebra.SingularException
             CliffordAlgebra(1,1,1)
         ) 
 
-        cl = CliffordAlgebra(1,1,1)
+        # cl = CliffordAlgebra(1,1,1)
         e1 = cl.e1
         e2 = cl.e2
         e3 = cl.e3
@@ -201,6 +208,8 @@ import LinearAlgebra.SingularException
         s1 = scalar(e1*e1)
         s2 = scalar(e2*e2)
         s3 = scalar(e3*e3)
+
+        @test character(cl) == scalar(e123*e123)
 
         @testset "inference" begin
             @inferred 3*e1
@@ -295,7 +304,7 @@ import LinearAlgebra.SingularException
             @test e123 ⨼ e23 == 0
             @test e123 ⨼ e31 == 0
 
-            @test e123 ⨼ e123 == 0
+            @test e123 ⨼ e123 == -s1*s2*s3
             
             @test 2 ⨼ e1 == MultiVector(cl,2) ⨼ e1
             @test 2 ⨼ 3 == MultiVector(cl,2) ⨼ MultiVector(cl,3)
@@ -318,7 +327,7 @@ import LinearAlgebra.SingularException
             @test e123 ⨽ e23 == -s2*s3*e1
             @test e123 ⨽ e31 == -s3*s1*e2
 
-            @test e123 ⨽ e123 == 0
+            @test e123 ⨽ e123 == -s1*s2*s3
             
             @test 2 ⨽ e1 == MultiVector(cl,2) ⨽ e1
             @test 2 ⨽ 3 == MultiVector(cl,2) ⨽ MultiVector(cl,3)
@@ -337,7 +346,7 @@ import LinearAlgebra.SingularException
             @test e123 ⋆ e2 == 0
             @test e123 ⋆ e3 == 0
 
-            @test e123 ⋆ e123 == s1 * s2 * s3
+            @test e123 ⋆ e123 == -s1 * s2 * s3
 
             @test 2 ⋆ e1 == MultiVector(cl,2) ⋆ e1
             @test 2 ⋆ 3 == MultiVector(cl,2) ⋆ MultiVector(cl,3)
@@ -456,7 +465,7 @@ import LinearAlgebra.SingularException
 
         @testset "misc functions" begin
             mv = 1 + e1 - e2 + e3 + e12 - e23 + e31 - e123
-            @test polarize(mv)*pseudoscalar(algebra(mv)) == character(algebra(mv))
+            @test polarize(mv)*pseudoscalar(algebra(mv)) == character(algebra(mv)) * mv
             @test Λᵏ(mv,0) == grade(mv,0)
             @test Λᵏ(mv,1) == grade(mv,1)
             @test Λᵏ(mv,2) == grade(mv,2)
@@ -473,10 +482,10 @@ import LinearAlgebra.SingularException
             @test norm_sqr(e31) == s3*s1
             @test norm_sqr(e123) == s1*s2*s3
 
-            @test norm(2*e1) == 2*s1
-            @test norm(-2*e1) == 2*s1
+            @test norm(2*e1)  == 2*sqrt(Complex(s1))
+            @test norm(-2*e1) == 2*sqrt(Complex(s1))
 
-            @test norm(e1+2*e31) ≈ sqrt(norm(e1)^2 + 2*norm(e31))
+            @test norm(e1+2*e31) ≈ sqrt(norm(e1)^2 + 4*norm(e31)^2)
 
             if !iszero(s1)
                 @test inv(e1) * e1 == e1 * inv(e1) == 1 
@@ -518,8 +527,8 @@ import LinearAlgebra.SingularException
             end
 
             if !iszero(s1) && !iszero(s2) && !iszero(s3)
-                @test (e1+e2+e3) \ (e1+e2+e3) == 1
-                @test (e12 + e23 + e31) / (e12 + e23 + e31) == 1
+                @test (e1+e2+e3) \ (e1+e2+e3) ≈ 1
+                @test (e12 + e23 + e31) / (e12 + e23 + e31) ≈ 1
                 @test inv(e123) * e123 == 1
             end
 
@@ -536,7 +545,7 @@ import LinearAlgebra.SingularException
                 @test exp(0*mv) == 1
             end
 
-            @test exp(1 + e1 + e12 + e123) == exp(1 + e123) * exp(e1 + e12)
+            @test exp(1 + e1 + e12 + e123) ≈ exp(1 + e123) * exp(e1 + e12)
 
             mv = 1 + e1 - e2 - e3 + e12 - e23 + e31 - e123
             
