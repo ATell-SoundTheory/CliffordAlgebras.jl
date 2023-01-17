@@ -70,7 +70,7 @@ struct CliffordAlgebra{Np,Nn,Nz,S,BT}
         Nzero = Int(Nzero)
         @assert Npos >= 0 && Nneg >= 0 && Nzero >=0 "Algebra signature must be non-negative."
         @assert Npos + Nneg + Nzero == N "Base symbol count must match signature."
-        BT = adaptbasefordual(enumeratebase(Int(N)))
+        BT = adaptbasefordual(enumeratebase(Vector, Int(N)))
         new{Npos,Nneg,Nzero,BaseSymbols,BT}()
     end
 end

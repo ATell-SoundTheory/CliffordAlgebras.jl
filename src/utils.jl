@@ -25,7 +25,10 @@ end
 
 Generates the basis vector product combinations for the Clifford algebra of an N dimensional vector space.
 """
-function enumeratebase(N::Integer)
+function enumeratebase(N::Integer)::Tuple
+    Tuple(enumeratebase(Vector, N))
+end
+function enumeratebase(::Type{Vector}, N::Integer)::Vector
     result = Tuple[]
     push!(result, ())
     for n = 1:N
@@ -36,7 +39,8 @@ function enumeratebase(N::Integer)
             !isnothing(s) || break
         end
     end
-    Tuple(result)
+    @assert length(result) == 2^N
+    return result
 end
 
 
@@ -45,7 +49,7 @@ end
 
 Shuffles the base vector products so that the Poincaré dual of every basis vector is another basis vector.
 """
-function adaptbasefordual(base)
+function adaptbasefordual(base)::Tuple
     N = length(base)
     Nh = N ÷ 2
     Tuple(
