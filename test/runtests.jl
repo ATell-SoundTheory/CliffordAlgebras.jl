@@ -50,6 +50,8 @@ import LinearAlgebra.SingularException
         @test !isapprox(alg.e1, 1, atol=1)
         @test isapprox(1, alg.e1, atol=2)
         @test !isapprox(1, alg.e1, atol=1)
+        @test isapprox(0alg.e1, 0alg.e1)
+        @test isapprox(0alg.e1, 0alg.e2)
     end
     @testset "Algebra" begin
         @test CliffordAlgebra(1,0,0) == CliffordAlgebra(1)
@@ -450,6 +452,69 @@ import LinearAlgebra.SingularException
                   rand(r) * e31 + rand(r) * e123
 
             @test mva ≀ mvb == mva * mvb * reverse(mva)
+        end
+
+        @testset "coefficients" begin
+            pga = typeof(CliffordAlgebra(:PGA3D))
+            mv = MultiVector(pga, (1:16...,), (101:116...,))
+            fib_ntuple = (1, 2, 3, 5, 8, 13)
+            fib_vec = [1, 2, 3, 5, 8, 13]
+            
+            @test coefficients(mv, fib_ntuple) == fib_ntuple .+ 100
+            @test coefficients(mv, fib_vec) == fib_vec .+ 100
+        end
+        
+        @testset "broadcasted" begin
+            pga = typeof(CliffordAlgebra(:PGA2D))
+            mvs = [
+                MultiVector(pga, (1:3...,), (2,2,2)),
+                MultiVector(pga, (1:6...,), (3,3,3,3,3,3)),
+                MultiVector(pga, (4:8...,), (5,5,5,5,5)),
+                MultiVector(pga, (1:8...,), (7,7,7,7,7,7,7,7)),
+            ]
+        
+            mv_muls = [
+                MultiVector(pga, (1, 2, 3), (4, 4, 4))
+                MultiVector(pga, (1, 2, 3), (6, 6, 6))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (0, 0, 0, 0, 0, 0, 0, 0))
+                MultiVector(pga, (1, 2, 3), (14, 14, 14))
+                MultiVector(pga, (1, 2, 3), (6, 6, 6))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (9, 9, 9, 9, 9, 9))
+                MultiVector(pga, (4, 5, 6), (15, 15, 15))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (21, 21, 21, 21, 21, 21))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (0, 0, 0, 0, 0, 0, 0, 0))
+                MultiVector(pga, (4, 5, 6), (15, 15, 15))
+                MultiVector(pga, (4, 5, 6, 7, 8), (25, 25, 25, 25, 25))
+                MultiVector(pga, (4, 5, 6, 7, 8), (35, 35, 35, 35, 35))
+                MultiVector(pga, (1, 2, 3), (14, 14, 14))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (21, 21, 21, 21, 21, 21))
+                MultiVector(pga, (4, 5, 6, 7, 8), (35, 35, 35, 35, 35))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (49, 49, 49, 49, 49, 49, 49, 49))
+            ]
+        
+            mv_divs = [
+                MultiVector(pga, (1, 2, 3), (1.0, 1.0, 1.0))
+                MultiVector(pga, (1, 2, 3), (0.6666666666666666, 0.6666666666666666, 0.6666666666666666))
+                MultiVector(pga, (1, 2, 3), (Inf, Inf, Inf))
+                MultiVector(pga, (1, 2, 3), (0.2857142857142857, 0.2857142857142857, 0.2857142857142857))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (1.5, 1.5, 1.5, Inf, Inf, Inf))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (Inf, Inf, Inf, 0.6, 0.6, 0.6))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6), (0.42857142857142855, 0.42857142857142855, 0.42857142857142855, 0.42857142857142855, 0.42857142857142855, 0.42857142857142855))
+                MultiVector(pga, (4, 5, 6, 7, 8), (Inf, Inf, Inf, Inf, Inf))
+                MultiVector(pga, (4, 5, 6, 7, 8), (1.6666666666666667, 1.6666666666666667, 1.6666666666666667, Inf, Inf))
+                MultiVector(pga, (4, 5, 6, 7, 8), (1.0, 1.0, 1.0, 1.0, 1.0))
+                MultiVector(pga, (4, 5, 6, 7, 8), (0.7142857142857143, 0.7142857142857143, 0.7142857142857143, 0.7142857142857143, 0.7142857142857143))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (3.5, 3.5, 3.5, Inf, Inf, Inf, Inf, Inf))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (2.3333333333333335, 2.3333333333333335, 2.3333333333333335, 2.3333333333333335, 2.3333333333333335, 2.3333333333333335, Inf, Inf))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (Inf, Inf, Inf, 1.4, 1.4, 1.4, 1.4, 1.4))
+                MultiVector(pga, (1, 2, 3, 4, 5, 6, 7, 8), (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0))
+            ]
+        
+            for ((mv1, mv2), mv_mul, mv_div) in zip(Iterators.product(mvs, mvs),  mv_muls, mv_divs)
+                @test isapprox((mv1 .* mv2), mv_mul)
+                @test isapprox(vector(mv2 ./ mv1), vector(mv_div))
+            end
         end
 
         @testset "norm" begin

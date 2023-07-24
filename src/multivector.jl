@@ -106,6 +106,26 @@ coefficients(mv::MultiVector) = getfield(mv,:c)
 
 
 """
+    coefficient(::MultiVector, n::Union{NTuple, AbstractVector})
+
+Returns the multivector coefficients for the given basis tuple or vector.
+Returns 0 if index is out of bounds.
+"""
+function coefficients(
+    mv::MultiVector{CA,T}, 
+    idxs::I
+)::I where {CA, T, I<:Union{NTuple, AbstractVector}}
+    bases = baseindices(mv)
+    coeffs = getfield(mv, :c)
+
+    return map(idxs) do idx
+        n = findfirst(isequal(idx), bases)
+        isnothing(n) ? zero(T) : coeffs[n]
+    end
+end
+
+
+"""
     coefficient(::MultiVector, n::Integer)
 
 Returns the multivector coefficients for the n-th basis vector. Returns 0 if n is out of bounds.
