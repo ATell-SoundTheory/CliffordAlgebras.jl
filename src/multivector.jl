@@ -106,20 +106,39 @@ coefficients(mv::MultiVector) = getfield(mv,:c)
 
 
 """
-    coefficient(::MultiVector, n::Union{NTuple, AbstractVector})
+    coefficients(::MultiVector, n::Union{NTuple{Integer}, AbstractVector{Integer}})
 
-Returns the multivector coefficients for the given basis tuple or vector.
+Returns the multivector coefficients for the given tuple/vector of basis indices.
 Returns 0 if index is out of bounds.
 """
 function coefficients(
     mv::MultiVector{CA,T}, 
-    idxs::I
-)::I where {CA, T, I<:Union{NTuple, AbstractVector}}
+    idxs::U
+) where {CA, T, U<:Union{NTuple{N,I} where {N}, AbstractVector{I}} where {I<:Integer}}
     bases = baseindices(mv)
     coeffs = getfield(mv, :c)
 
     return map(idxs) do idx
         n = findfirst(isequal(idx), bases)
+        isnothing(n) ? zero(T) : coeffs[n]
+    end
+end
+
+"""
+    coefficients(::MultiVector, n::Union{NTuple{Symbol}, AbstractVector{Symbol}})
+
+Returns the multivector coefficients for the given tuple/vector of basis symbols.
+Returns 0 if the symbol is not a valid basis symbol.
+"""
+function coefficients(
+    mv::MultiVector{CA,T}, 
+    syms::U
+) where {CA, T, U<:Union{NTuple{N,Symbol} where {N}, AbstractVector{Symbol}}}
+    bases = baseindices(mv)
+    coeffs = getfield(mv, :c)
+
+    return map(syms) do sym
+        n = findfirst(i -> isequal(sym, basesymbol(CA,i)), bases)
         isnothing(n) ? zero(T) : coeffs[n]
     end
 end

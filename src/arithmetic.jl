@@ -640,9 +640,9 @@ function broadcasted(::typeof(/), a::MultiVector{CA,Ta,BI}, b::MultiVector{CA,Tb
 end
 
 function broadcasted(::typeof(/), a::MultiVector{CA,Ta,BIa}, b::MultiVector{CA,Tb,BIb})::MultiVector where {CA,Ta,Tb,BIa,BIb}
-    BI = tuple(union(BIa, BIb)...)
-    v1, v2 = coefficients(a, BI), coefficients(b, BI)
-    return MultiVector(CA, BI, v1 ./ v2)
+    @assert BIa ⊆ BIb
+    v1, v2 = coefficients(a, BIb), coefficients(b, BIb)
+    return MultiVector(CA, BIb, v1 ./ v2)
 end
 
 """
