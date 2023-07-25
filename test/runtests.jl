@@ -50,6 +50,8 @@ import LinearAlgebra.SingularException
         @test !isapprox(alg.e1, 1, atol=1)
         @test isapprox(1, alg.e1, atol=2)
         @test !isapprox(1, alg.e1, atol=1)
+        @test isapprox(0alg.e1, 0alg.e1)
+        @test isapprox(0alg.e1, 0alg.e2)
     end
     @testset "Algebra" begin
         @test CliffordAlgebra(1,0,0) == CliffordAlgebra(1)
@@ -450,6 +452,69 @@ import LinearAlgebra.SingularException
                   rand(r) * e31 + rand(r) * e123
 
             @test mva ≀ mvb == mva * mvb * reverse(mva)
+        end
+
+        @testset "coefficients" begin
+            pga = typeof(CliffordAlgebra(:PGA3D))
+            mv_int = MultiVector(pga, (1:16...,), (101:116...,))
+            mv_float = MultiVector(pga, (1:16...,), (101.5:116.5...,))
+            
+            fib_ntuple = (1, 2, 3, 5, 8, 13)
+            fib_vec = [1, 2, 3, 5, 8, 13]
+            sym_ntuple = (:𝟏, :e1, :e2, :e0, :e2e3, :e1e2e0)
+            sym_vec = [:𝟏, :e1, :e2, :e0, :e2e3, :e1e2e0]
+            
+            @test coefficients(mv_int, fib_ntuple) == fib_ntuple .+ 100
+            @test coefficients(mv_int, fib_vec) == fib_vec .+ 100
+            @test coefficients(mv_float, fib_ntuple) == fib_ntuple .+ 100.5
+            @test coefficients(mv_float, fib_vec) == fib_vec .+ 100.5
+            
+            @test coefficients(mv_int, sym_ntuple) == fib_ntuple .+ 100
+            @test coefficients(mv_int, sym_vec) == fib_vec .+ 100
+            @test coefficients(mv_float, sym_ntuple) == fib_ntuple .+ 100.5
+            @test coefficients(mv_float, sym_vec) == fib_vec .+ 100.5
+        end
+        
+        @testset "broadcasted .*" begin
+            pga = typeof(CliffordAlgebra(:PGA2D))
+            mvs = [
+                MultiVector(pga, (1:3...,), (2,2,2)),
+                MultiVector(pga, (1:6...,), (3,3,3,3,3,3)),
+                MultiVector(pga, (4:8...,), (5,5,5,5,5)),
+                MultiVector(pga, (1:8...,), (7,7,7,7,7,7,7,7)),
+            ]
+            
+            for mv1 in mvs, mv2 in mvs
+                @test isapprox(vector(mv1 .* mv2), vector(mv1) .* vector(mv2))
+            end
+        end
+
+        @testset "broadcasted ./" begin
+            pga = typeof(CliffordAlgebra(:PGA2D))
+
+            function semi_safe_divide(x, y)
+                if x == 0 && y == 0
+                    return 0
+                else
+                    return x / y
+                end
+            end
+
+            mv_zero = MultiVector(pga, (1:3...,), (0, 0, 0))
+            mv_small = MultiVector(pga, (1:3...,), (2, 2, 2))
+            mv_full = MultiVector(pga, (1:8...,), (7, 7, 7, 7, 7, 7, 7, 7))
+
+            @test isapprox(vector(mv_small ./ mv_zero), [Inf, Inf, Inf, 0, 0, 0, 0, 0])
+            @test isapprox(vector(mv_small ./ mv_zero), semi_safe_divide.(vector(mv_small), vector(mv_zero)))
+            @test_throws AssertionError mv_full ./ mv_zero
+
+            @test isapprox(vector(mv_zero ./ mv_small), semi_safe_divide.(vector(mv_zero), vector(mv_small)))
+            @test isapprox(vector(mv_small ./ mv_small), semi_safe_divide.(vector(mv_small), vector(mv_small)))
+            @test_throws AssertionError mv_full ./ mv_small
+
+            @test isapprox(vector(mv_zero ./ mv_full), semi_safe_divide.(vector(mv_zero), vector(mv_full)))
+            @test isapprox(vector(mv_small ./ mv_full), semi_safe_divide.(vector(mv_small), vector(mv_full)))
+            @test isapprox(vector(mv_full ./ mv_full), semi_safe_divide.(vector(mv_full), vector(mv_full)))
         end
 
         @testset "norm" begin

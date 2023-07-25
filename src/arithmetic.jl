@@ -1,6 +1,7 @@
 # MultiVector arithmetic for CliffordAlgebras.jl
 
 import Base.+, Base.-, Base.*, Base./, Base.\
+import Base.broadcasted
 import Base.inv, Base.adjoint, Base.exp
 import LinearAlgebra.norm, LinearAlgebra.norm_sqr
 import LinearAlgebra.SingularException
@@ -148,6 +149,21 @@ end
 
 function mul_with_scalar(s::Real,mv::MultiVector)
     map_coefficients(x->s*x,mv)
+end
+
+"""
+    mv1 .* mv2
+
+Calculates the element wise product between the Mulivectors a and b.
+"""
+function broadcasted(::typeof(*), a::MultiVector{CA,Ta,BI}, b::MultiVector{CA,Tb,BI})::MultiVector where {CA,Ta,Tb,BI}
+    return MultiVector(CA, BI, coefficients(a) .* coefficients(b))
+end
+
+function broadcasted(::typeof(*), a::MultiVector{CA,Ta,BIa}, b::MultiVector{CA,Tb,BIb})::MultiVector where {CA,Ta,Tb,BIa,BIb}
+    BI = tuple(union(BIa, BIb)...)
+    v1, v2 = coefficients(a, BI), coefficients(b, BI)
+    return MultiVector(CA, BI, v1 .* v2)
 end
 
 """
@@ -417,6 +433,7 @@ function Base.isapprox(mv1::MultiVector, mv2::MultiVector;
         rtol=default_rtol(mv1, mv2),
 )
     algebra(mv1) === algebra(mv2) || return false
+    iszero(mv1) && iszero(mv2) && return true
     n1 = norm(coefficients(mv1))
     n2 = norm(coefficients(mv2))
     n12 = norm(coefficients(mv1 - mv2))
@@ -612,6 +629,21 @@ Calculates the MultiVector quotient a/b by evaluating inv(b)*a.
 (\)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = inv(a) * b
 (\)(a::Real, b::MultiVector{CA}) where {CA} = inv(a) * b
 (\)(a::MultiVector{CA}, b::Real) where {CA} = inv(a) * b
+
+"""
+    a ./ b
+
+Calculates the element wise division between the MultiVectors a and b.
+"""
+function broadcasted(::typeof(/), a::MultiVector{CA,Ta,BI}, b::MultiVector{CA,Tb,BI})::MultiVector where {CA,Ta,Tb,BI}
+    return MultiVector(CA, BI, coefficients(a) ./ coefficients(b))
+end
+
+function broadcasted(::typeof(/), a::MultiVector{CA,Ta,BIa}, b::MultiVector{CA,Tb,BIb})::MultiVector where {CA,Ta,Tb,BIa,BIb}
+    @assert BIa ⊆ BIb
+    v1, v2 = coefficients(a, BIb), coefficients(b, BIb)
+    return MultiVector(CA, BIb, v1 ./ v2)
+end
 
 """
     exp(::MultiVector)
