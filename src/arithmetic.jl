@@ -2,7 +2,15 @@
 
 import Base.+, Base.-, Base.*, Base./, Base.\
 import Base.inv, Base.adjoint, Base.exp
-import LinearAlgebra.norm, LinearAlgebra.norm_sqr
+using LinearAlgebra
+import LinearAlgebra: norm
+# Julia <= 1.6 does not define LinearAlgebra.norm_sqr; conditionally import or define a stub
+if isdefined(LinearAlgebra, :norm_sqr)
+    import LinearAlgebra: norm_sqr
+else
+    # Define a local function symbol so our methods below compile on 1.6
+    function norm_sqr end
+end
 import LinearAlgebra.SingularException
 import StaticArrays.SVector, StaticArrays.SMatrix
 import SparseArrays.sparse, SparseArrays.sparsevec
