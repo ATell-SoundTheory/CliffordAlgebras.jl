@@ -1,4 +1,8 @@
-push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
+using Pkg
+Pkg.activate(@__DIR__)
+Pkg.develop(PackageSpec(path=joinpath(@__DIR__, "..")))
+Pkg.instantiate()
+
 using Documenter, CliffordAlgebras
 
 makedocs(
