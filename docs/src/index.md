@@ -9,25 +9,19 @@ CliffordAlgebras.jl provides a comprehensive implementation of Clifford algebras
 ## Quick Start
 
 ```jldoctest
-using CliffordAlgebras
+julia> using CliffordAlgebras
 
-# Create a 2D Clifford algebra Cl(2,0,0)
-cl2 = CliffordAlgebra(2)
+julia> cl2 = CliffordAlgebra(2)
+Cl(2, 0, 0)
 
-# Access basis vectors
-e1 = cl2.e1
-e2 = cl2.e2
-e12 = cl2.e1e2  # bivector
+julia> e1, e2, e12 = cl2.e1, cl2.e2, cl2.e1e2;
 
-# Create multivectors
-mv = 1 + 2*e1 + 3*e2 + 4*e12
+julia> mv = 1 + 2*e1 + 3*e2 + 4*e12;
 
-# Perform operations
-result = mv * e1  # geometric product
-result isa MultiVector  # doctest: +ellipses
+julia> mv * e1 isa MultiVector
 true
-wedge = e1 ∧ e2   # exterior product
-wedge == cl2.e1e2
+
+julia> e1 ∧ e2 == cl2.e1e2
 true
 ```
 

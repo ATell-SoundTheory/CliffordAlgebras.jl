@@ -5,9 +5,7 @@ This tutorial will walk you through the basics of using CliffordAlgebras.jl for 
 ## Installation
 
 ```jldoctest
-using Pkg
-Pkg.add("CliffordAlgebras")
-using CliffordAlgebras
+julia> using CliffordAlgebras
 ```
 
 ## Lesson 1: Creating Your First Algebra
@@ -15,14 +13,10 @@ using CliffordAlgebras
 Let's start with the simplest non-trivial Clifford algebra, Cl(2,0,0):
 
 ```jldoctest
-# Create a 2D Euclidean geometric algebra
-cl2 = CliffordAlgebra(2)
+julia> cl2 = CliffordAlgebra(2)
+Cl(2, 0, 0)
 
-# Inspect the algebra
-println(cl2)  # Prints: Cl(2,0,0)
-
-# View the multiplication table (smoke test)
-cayleytable(IOBuffer(), cl2)
+julia> io = IOBuffer(); cayleytable(io, cl2); true
 true
 ```
 
@@ -33,17 +27,19 @@ This creates an algebra with 2 basis vectors e₁ and e₂ that both square to +
 Every Clifford algebra has 2ⁿ basis elements for n generators:
 
 ```jldoctest
-# Access basis elements
-scalar_unit = cl2.𝟏      # Scalar unit
-e1 = cl2.e1             # First basis vector  
-e2 = cl2.e2             # Second basis vector
-e12 = cl2.e1e2          # Bivector (area element)
+julia> scalar_unit, e1, e2, e12 = cl2.𝟏, cl2.e1, cl2.e2, cl2.e1e2;
 
-# Check their properties
-println("e1² = ", e1 * e1)     # Should be +1
-println("e2² = ", e2 * e2)     # Should be +1  
-println("e1e2 = ", e1 * e2)    # Should be e1e2
-println("e2e1 = ", e2 * e1)    # Should be -e1e2 (anticommutative)
+julia> e1*e1
+1
+
+julia> e2*e2
+1
+
+julia> e1*e2 == e12
+true
+
+julia> e2*e1 == -e12
+true
 ```
 
 ## Lesson 3: Building Multivectors
@@ -51,15 +47,16 @@ println("e2e1 = ", e2 * e1)    # Should be -e1e2 (anticommutative)
 A general multivector combines elements of different grades:
 
 ```jldoctest
-# Create a general multivector
-mv = 2.0 + 3.0*e1 + 4.0*e2 + 5.0*e12
+julia> mv = 2.0 + 3.0*e1 + 4.0*e2 + 5.0*e12;
 
-println("Multivector: ", mv)
+julia> scalar(mv)
+2.0
 
-# Extract components by grade
-println("Scalar part: ", scalar(mv))
-println("Vector part: ", grade(mv, 1))
-println("Bivector part: ", grade(mv, 2))
+julia> grade(mv, 1) isa MultiVector
+true
+
+julia> grade(mv, 2) isa MultiVector
+true
 ```
 
 ## Lesson 4: The Geometric Product
@@ -67,17 +64,10 @@ println("Bivector part: ", grade(mv, 2))
 The geometric product is the fundamental operation:
 
 ```jldoctest
-# Two vectors
-a = 2*e1 + 3*e2
-b = 4*e1 + 5*e2
+julia> a = 2*e1 + 3*e2; b = 4*e1 + 5*e2;
 
-# Geometric product
-result = a * b
-println("a * b = ", result)
-
-# The result has both scalar and bivector parts
-println("Scalar part: ", scalar(result))        # Dot product
-println("Bivector part: ", grade(result, 2))    # Wedge product
+julia> result = a * b; (scalar(result), grade(result, 2) isa MultiVector)
+(23.0, true)
 ```
 
 ## Lesson 5: Specialized Products
@@ -86,25 +76,22 @@ println("Bivector part: ", grade(result, 2))    # Wedge product
 Creates higher-grade elements:
 
 ```jldoctest
-# Exterior product of vectors creates bivector
-area_element = e1 ∧ e2
-println("e1 ∧ e2 = ", area_element)
+julia> area_element = e1 ∧ e2; area_element == e12
+true
 
-# Vectors wedge with themselves give zero
-println("e1 ∧ e1 = ", e1 ∧ e1)
+julia> e1 ∧ e1
+0
 ```
 
 ### Interior Products
 Various ways to contract multivectors:
 
 ```jldoctest
-# Fat dot product (symmetric part of geometric product)
-fat_dot = a ⋅ b
-println("a ⋅ b = ", fat_dot)
+julia> fat_dot = a ⋅ b; fat_dot isa MultiVector
+true
 
-# Scalar product (fully contracted)
-scalar_prod = a ⋆ b  
-println("a ⋆ b = ", scalar_prod)
+julia> scalar_prod = a ⋆ b; scalar(scalar_prod) isa Real
+true
 ```
 
 ## Lesson 6: Rotations in 2D
@@ -112,25 +99,16 @@ println("a ⋆ b = ", scalar_prod)
 One of the most important applications is representing rotations:
 
 ```jldoctest
-# Create a vector to rotate
-v = e1
+julia> v = e1; angle = π/4; B = angle * e12;
 
-# Create a rotation bivector (angle in bivector form)
-angle = π/4  # 45 degrees
-B = angle * e12
+julia> rotor = exp(B);
 
-# Create the rotor using exponential
-rotor = exp(B)
-println("Rotor: ", rotor)
+julia> rotated_v = rotor ≀ v;
 
-# Apply rotation using sandwich product
-rotated_v = rotor ≀ v
-println("Rotated vector: ", rotated_v)
+julia> expected = (e1 + e2) / sqrt(2);
 
-# Verify the rotation (should be (e1 + e2)/√2)
-expected = (e1 + e2) / sqrt(2)
-println("Expected: ", expected)
-println("Close? ", rotated_v ≈ expected)
+julia> rotated_v ≈ expected
+true
 ```
 
 ## Lesson 7: Working with 3D Space
