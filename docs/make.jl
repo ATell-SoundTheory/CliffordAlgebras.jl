@@ -29,5 +29,8 @@ makedocs(
 deploydocs(
     repo = "github.com/ATell-SoundTheory/CliffordAlgebras.jl.git",
     devbranch = "master",
-    versions = nothing,
+    versions = [
+        "stable" => "v^",
+        "dev" => "master",
+    ],
 )
