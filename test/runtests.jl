@@ -1,5 +1,6 @@
 using CliffordAlgebras
 using Test
+include("aqua.jl")
 import LinearAlgebra.SingularException
 
 @testset "CliffordAlgebras.jl" begin

@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "CliffordAlgebras.jl: Fast Clifford/Geometric Algebra in Julia"
+version: "0.1.2"
+authors:
+  - family-names: "Tell"
+    given-names: "Andreas"
+    email: "atell@soundtheory.com"
+repository-code: "https://github.com/ATell-SoundTheory/CliffordAlgebras.jl"
+license: "MIT"
+abstract: "A fast, lightweight and easy-to-use Julia package for Clifford and Geometric Algebras, with compile-time specialization and sparse multivector representation."
+keywords:
+  - Julia
+  - Clifford algebra
+  - Geometric algebra
+  - Computer graphics
+  - Computational geometry
+preferred-citation:
+  type: article
+  title: "CliffordAlgebras.jl: Fast Clifford/Geometric Algebra in Julia"
+  authors:
+    - family-names: "Tell"
+      given-names: "Andreas"
+  year: 2025
+  journal: "Zenodo"

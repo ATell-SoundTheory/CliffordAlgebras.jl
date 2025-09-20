@@ -8,7 +8,7 @@ CliffordAlgebras.jl provides a comprehensive implementation of Clifford algebras
 
 ## Quick Start
 
-```julia
+```jldoctest
 using CliffordAlgebras
 
 # Create a 2D Clifford algebra Cl(2,0,0)
@@ -24,7 +24,11 @@ mv = 1 + 2*e1 + 3*e2 + 4*e12
 
 # Perform operations
 result = mv * e1  # geometric product
+result isa MultiVector  # doctest: +ellipses
+true
 wedge = e1 ∧ e2   # exterior product
+wedge == cl2.e1e2
+true
 ```
 
 ## Mathematical Background

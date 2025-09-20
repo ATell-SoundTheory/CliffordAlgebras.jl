@@ -6,8 +6,6 @@ import LinearAlgebra.norm, LinearAlgebra.norm_sqr
 import LinearAlgebra.SingularException
 import StaticArrays.SVector, StaticArrays.SMatrix
 import SparseArrays.sparse, SparseArrays.sparsevec
-
-
 @generated function (+)(a::MultiVector{CA,Ta}, b::MultiVector{CA,Tb}) where {CA,Ta,Tb}
     d = dimension(CA)
     acc_a = [Int(0) for n = 1:d]
@@ -703,10 +701,10 @@ Calculates the MultiVector quotient a/b by evaluating a*inv(b).
 (/)(a::MultiVector{CA}, b::Real) where {CA} = a * inv(b)
 
 """
-    b \\ a
-    (\\)(b::MultiVector{CA}, b::MuliVector{CA}) where CA
+    a \\ b
+    (\\)(a::MultiVector{CA}, b::MultiVector{CA}) where CA
 
-Calculates the MultiVector quotient a/b by evaluating inv(b)*a.
+Left division defined as `inv(a) * b`.
 """
 (\)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = inv(a) * b
 (\)(a::Real, b::MultiVector{CA}) where {CA} = inv(a) * b

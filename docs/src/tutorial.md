@@ -4,7 +4,7 @@ This tutorial will walk you through the basics of using CliffordAlgebras.jl for 
 
 ## Installation
 
-```julia
+```jldoctest
 using Pkg
 Pkg.add("CliffordAlgebras")
 using CliffordAlgebras
@@ -14,15 +14,16 @@ using CliffordAlgebras
 
 Let's start with the simplest non-trivial Clifford algebra, Cl(2,0,0):
 
-```julia
+```jldoctest
 # Create a 2D Euclidean geometric algebra
 cl2 = CliffordAlgebra(2)
 
 # Inspect the algebra
 println(cl2)  # Prints: Cl(2,0,0)
 
-# View the multiplication table
-cayleytable(stdout, cl2)
+# View the multiplication table (smoke test)
+cayleytable(IOBuffer(), cl2)
+true
 ```
 
 This creates an algebra with 2 basis vectors e₁ and e₂ that both square to +1.
@@ -31,7 +32,7 @@ This creates an algebra with 2 basis vectors e₁ and e₂ that both square to +
 
 Every Clifford algebra has 2ⁿ basis elements for n generators:
 
-```julia
+```jldoctest
 # Access basis elements
 scalar_unit = cl2.𝟏      # Scalar unit
 e1 = cl2.e1             # First basis vector  
@@ -49,7 +50,7 @@ println("e2e1 = ", e2 * e1)    # Should be -e1e2 (anticommutative)
 
 A general multivector combines elements of different grades:
 
-```julia
+```jldoctest
 # Create a general multivector
 mv = 2.0 + 3.0*e1 + 4.0*e2 + 5.0*e12
 
@@ -65,7 +66,7 @@ println("Bivector part: ", grade(mv, 2))
 
 The geometric product is the fundamental operation:
 
-```julia
+```jldoctest
 # Two vectors
 a = 2*e1 + 3*e2
 b = 4*e1 + 5*e2
@@ -84,7 +85,7 @@ println("Bivector part: ", grade(result, 2))    # Wedge product
 ### Exterior Product (Wedge Product)
 Creates higher-grade elements:
 
-```julia
+```jldoctest
 # Exterior product of vectors creates bivector
 area_element = e1 ∧ e2
 println("e1 ∧ e2 = ", area_element)
@@ -96,7 +97,7 @@ println("e1 ∧ e1 = ", e1 ∧ e1)
 ### Interior Products
 Various ways to contract multivectors:
 
-```julia
+```jldoctest
 # Fat dot product (symmetric part of geometric product)
 fat_dot = a ⋅ b
 println("a ⋅ b = ", fat_dot)
@@ -110,7 +111,7 @@ println("a ⋆ b = ", scalar_prod)
 
 One of the most important applications is representing rotations:
 
-```julia
+```jldoctest
 # Create a vector to rotate
 v = e1
 

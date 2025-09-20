@@ -7,6 +7,8 @@
 # CliffordAlgebras.jl
 
 A fast, lightweight and easy-to-use Julia package for Clifford Algebras and Geometric Algebras.
+Contributions welcome—see `CONTRIBUTING.md`. See `CHANGELOG.md` for notable changes. Many examples in the docs are doctested.
+If you're contributing, see the Developer Guide in the docs: https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev/developer/
 
 CliffordAlgebras.jl uses compile time code generation, sparse multivector representation and special case identification to handle arbitrary geometric algebras efficiently. Lazy evaluation of expressions is not yet supported.
 
@@ -18,7 +20,7 @@ Generate a Clifford algebra:
 julia> cl2 = CliffordAlgebra(2)
 Cl(2,0,0)
 
-julia> calyeytable(stdout, cl2)
+julia> cayleytable(stdout, cl2)
 ┌───────┬──────────────┬───────┐
 │  +1   │  +e1    +e2  │ +e1e2 │
 ├───────┼──────────────┼───────┤
@@ -123,7 +125,7 @@ julia> mv1 ≀ mv2
 +14.0+12.0×e1-8.0×e2 ∈ Cl(2, 0, 0)
 ```
 
-Calculate the inverse of a multivector and divde multivectors:
+Calculate the inverse of a multivector and divide multivectors:
 
 ``` 
 julia> inv(mv2)

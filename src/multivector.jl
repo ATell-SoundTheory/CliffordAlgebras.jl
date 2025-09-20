@@ -4,6 +4,7 @@ import Base.zero, Base.one, Base.iszero, Base.isone
 import Base.==, Base.show, Base.eltype, Base.convert
 import Base.getproperty, Base.propertynames, Base.conj
 import Base.reverse, Base.~
+import Base.hash, Base.isequal
 
 """
     MultiVector{CA,T,BI}
@@ -15,13 +16,14 @@ struct MultiVector{CA,T,BI,K}
     c::NTuple{K,T}
 end
 function MultiVector(
-    CA::Type{<:CliffordAlgebra},
-    BI::NTuple{K,Integer},
-    c::NTuple{K,T},
-) where {K,T<:Real}
-    @assert length(BI) > 0 
+    ::Type{CA},
+    BI::NTuple{K,<:Integer},
+    c::NTuple{K,<:Real},
+) where {CA<:CliffordAlgebra,K}
+    @assert K > 0
     #@assert issorted(BI) && allunique(BI)
-    MultiVector{CA,T,convert(NTuple{K,Int}, BI),K}(c)
+    Tc = eltype(c)
+    MultiVector{CA,Tc,convert(NTuple{K,Int}, BI),K}(c)
 end
 
 """
@@ -30,12 +32,12 @@ end
 
 Creates a MultiVector from the real number a with only a scalar component. The internal storage type of the MultiVector is the type of a.
 """
-function MultiVector(CA::Type{<:CliffordAlgebra}, a::T) where {T<:Real}
+function MultiVector(::Type{CA}, a::T) where {CA<:CliffordAlgebra,T<:Real}
     BI = (1,)
     K = 1
     MultiVector{CA,T,BI,K}((a,))
 end
-MultiVector(ca::CliffordAlgebra, a::T) where {T<:Real} = MultiVector(typeof(ca), a)
+MultiVector(ca::CA, a::T) where {CA<:CliffordAlgebra,T<:Real} = MultiVector(CA, a)
 
 """
     MultiVector(::CliffordAlgebra, v::NTuple{N,T}) where {N,T<:Real}
@@ -43,13 +45,13 @@ MultiVector(ca::CliffordAlgebra, a::T) where {T<:Real} = MultiVector(typeof(ca),
 
 Creates a MultiVector by converting the provided vector v to a 1-vector. The internal storage type of the MultiVector is T.
 """
-function MultiVector(CA::Type{<:CliffordAlgebra}, v::NTuple{N,T}) where {N,T<:Real}
+function MultiVector(::Type{CA}, v::NTuple{N,<:Real}) where {CA<:CliffordAlgebra,N}
     @assert N == order(CA) "Dimension count mismatch."
     MultiVector(CA, Tuple(2:N+1), v)
 end
 
-MultiVector(ca::CliffordAlgebra, v::NTuple{N,T}) where {N,T<:Real} =
-    MultiVector(typeof(ca), v)
+MultiVector(ca::CA, v::NTuple{N,<:Real}) where {CA<:CliffordAlgebra,N} =
+    MultiVector(CA, v)
 
 zero(::Type{<:MultiVector{CA,T}}) where {CA,T} = MultiVector(CA, zero(T))
 zero(mv::MultiVector) = zero(typeof(mv))
@@ -95,6 +97,29 @@ end
 
 (==)(a::MultiVector{CA}, b::Real) where CA = a == MultiVector(CA, b)
 (==)(a::Real, b::MultiVector) = b == a
+
+"""
+    isequal(a::MultiVector, b::MultiVector)
+
+Identity-based equality for hashing/Set/Dict usage. Requires same algebra type and
+bitwise-equivalent sparse structure and coefficients. For approximate comparison, use `isapprox`.
+"""
+function isequal(a::MultiVector{CA}, b::MultiVector{CB}) where {CA,CB}
+    CA === CB || return false
+    baseindices(a) == baseindices(b) || return false
+    coefficients(a) == coefficients(b)
+end
+
+"""
+    hash(mv::MultiVector, h::UInt)
+
+Combine algebra type, base indices, and coefficients into the hash.
+"""
+function hash(mv::MultiVector, h::UInt)
+    h = hash(Algebra(mv), h)
+    h = hash(baseindices(mv), h)
+    hash(coefficients(mv), h)
+end
 
 
 """

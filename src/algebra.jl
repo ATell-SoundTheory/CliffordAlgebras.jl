@@ -4,6 +4,10 @@ import Base.show
 import Combinatorics.levicivita
 import PrettyTables.pretty_table
 
+"""
+Internal cache for multiplication tables keyed by the CliffordAlgebra type.
+"""
+const _multtable_cache = IdDict{DataType, Any}()
 
 """
     basevectorproduct(Npos::Integer, Nneg::Integer, Nzero::Integer, base::Tuple, kl::Integer, kr::Integer)
@@ -189,9 +193,14 @@ basetable(ca::CliffordAlgebra) = basetable(typeof(ca))
     multtable(::CliffordAlgebra)
     multtable(::Type{<:CliffordAlgebra})
 
-Returns the internal multuplication table of the geometric product of the algebra.
+Returns the internal multiplication table of the geometric product of the algebra.
+Multiplication tables are cached per algebra type to avoid recomputation.
 """
-multtable(::Type{<:CliffordAlgebra{Np,Nn,Nz,S,BT}}) where {Np,Nn,Nz,S,BT} = multiplicationtable(Np, Nn, Nz, BT)
+function multtable(::Type{CA}) where {Np,Nn,Nz,S,BT, CA<:CliffordAlgebra{Np,Nn,Nz,S,BT}}
+    get!(_multtable_cache, CA) do
+        multiplicationtable(Np, Nn, Nz, BT)
+    end
+end
 multtable(ca::CliffordAlgebra) = multtable(typeof(ca))
 
 """
@@ -296,8 +305,8 @@ basesymbol(ca::CliffordAlgebra, n::Integer) = basesymbol(typeof(ca), n)
 
 
 """
-    caleytable(io::IO, ca::CliffordAlgebra)
-    caleytable(io::IO, CA::Type{<:CliffordAlgebra})
+    cayleytable(io::IO, ca::CliffordAlgebra)
+    cayleytable(io::IO, CA::Type{<:CliffordAlgebra})
 
 Generates a Cayley table view of the algebra.
 """
