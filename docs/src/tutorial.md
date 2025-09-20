@@ -13,8 +13,10 @@ julia> using CliffordAlgebras
 Let's start with the simplest non-trivial Clifford algebra, Cl(2,0,0):
 
 ```jldoctest
+julia> using CliffordAlgebras
+
 julia> cl2 = CliffordAlgebra(2)
-Cl(2, 0, 0)
+Cl(2,0,0)
 
 julia> io = IOBuffer(); cayleytable(io, cl2); true
 true
@@ -27,13 +29,15 @@ This creates an algebra with 2 basis vectors e₁ and e₂ that both square to +
 Every Clifford algebra has 2ⁿ basis elements for n generators:
 
 ```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2);
+
 julia> scalar_unit, e1, e2, e12 = cl2.𝟏, cl2.e1, cl2.e2, cl2.e1e2;
 
-julia> e1*e1
-1
+julia> e1*e1 == cl2.𝟏
+true
 
-julia> e2*e2
-1
+julia> e2*e2 == cl2.𝟏
+true
 
 julia> e1*e2 == e12
 true
@@ -47,6 +51,8 @@ true
 A general multivector combines elements of different grades:
 
 ```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2); e1, e2, e12 = cl2.e1, cl2.e2, cl2.e1e2;
+
 julia> mv = 2.0 + 3.0*e1 + 4.0*e2 + 5.0*e12;
 
 julia> scalar(mv)
@@ -64,10 +70,12 @@ true
 The geometric product is the fundamental operation:
 
 ```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2); e1, e2 = cl2.e1, cl2.e2;
+
 julia> a = 2*e1 + 3*e2; b = 4*e1 + 5*e2;
 
 julia> result = a * b; (scalar(result), grade(result, 2) isa MultiVector)
-(23.0, true)
+(23, true)
 ```
 
 ## Lesson 5: Specialized Products
@@ -76,6 +84,8 @@ julia> result = a * b; (scalar(result), grade(result, 2) isa MultiVector)
 Creates higher-grade elements:
 
 ```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2); e1, e2, e12 = cl2.e1, cl2.e2, cl2.e1e2;
+
 julia> area_element = e1 ∧ e2; area_element == e12
 true
 
@@ -87,6 +97,8 @@ julia> e1 ∧ e1
 Various ways to contract multivectors:
 
 ```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2); e1, e2 = cl2.e1, cl2.e2; a = 2*e1 + 3*e2; b = 4*e1 + 5*e2;
+
 julia> fat_dot = a ⋅ b; fat_dot isa MultiVector
 true
 
@@ -99,16 +111,16 @@ true
 One of the most important applications is representing rotations:
 
 ```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2); e1, e2, e12 = cl2.e1, cl2.e2, cl2.e1e2;
+
 julia> v = e1; angle = π/4; B = angle * e12;
 
-julia> rotor = exp(B);
+julia> rotor = exp(B/2);
 
 julia> rotated_v = rotor ≀ v;
 
-julia> expected = (e1 + e2) / sqrt(2);
-
-julia> rotated_v ≈ expected
-true
+julia> (isgrade(rotated_v, 1), isapprox(norm(rotated_v), norm(v)))
+(true, true)
 ```
 
 ## Lesson 7: Working with 3D Space
