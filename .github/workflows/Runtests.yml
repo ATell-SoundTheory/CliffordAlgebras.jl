@@ -1,13 +1,15 @@
 name: Runtests
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 jobs:
   test:
-    name: "Runtests ${{matrix.julia-version}} - ${{ matrix.os }}"
+    name: "Runtests ${{ matrix.julia-version }} - ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-  julia-version: ['1.6', '1.10', '1']
+        julia-version: ['1.6', '1.10', '1']
         julia-arch: [x64]
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
