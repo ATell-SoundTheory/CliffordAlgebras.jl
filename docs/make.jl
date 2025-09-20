@@ -12,6 +12,7 @@ makedocs(
     sitename = "CliffordAlgebras.jl Documentation",
     modules = [CliffordAlgebras],
     doctest = true,
+    checkdocs = :exports,
     pages = [
         "Home" => "index.md",
         "Tutorial" => "tutorial.md", 

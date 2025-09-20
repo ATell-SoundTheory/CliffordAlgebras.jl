@@ -12,8 +12,8 @@ Order = [:type, :function]
 
 ## Internal API (advanced)
 
-```@autodocs
-Modules = [CliffordAlgebras]
-Private = true
-Order = [:type, :function]
+The following internal item is documented for completeness:
+
+```@docs
+CliffordAlgebras._multtable_cache
 ```

@@ -12,7 +12,7 @@ CliffordAlgebras.jl provides a comprehensive implementation of Clifford algebras
 julia> using CliffordAlgebras
 
 julia> cl2 = CliffordAlgebra(2)
-Cl(2, 0, 0)
+Cl(2,0,0)
 
 julia> e1, e2, e12 = cl2.e1, cl2.e2, cl2.e1e2;
 
@@ -239,10 +239,4 @@ event = sta.t + 2*sta.x + 3*sta.y + 4*sta.z
 interval = scalar(event * ~event)
 ```
 
-## API Reference
-
-```@autodocs
-Modules = [CliffordAlgebras]
-Private = false
-Order = [:function,:type]
-```
+ 
