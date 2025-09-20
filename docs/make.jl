@@ -1,3 +1,4 @@
+push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
 using Documenter, CliffordAlgebras
 
 makedocs(
