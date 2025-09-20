@@ -233,3 +233,14 @@ julia> M = [0 1 ; 1 0]
 julia> outermorphism(M, mv1)
 +1.0+2.0×e2-1.0×e1e2 ∈ Cl(2, 0, 0)
 ```
+
+## Benchmarks
+
+This repo includes a small benchmark suite in `benchmark/`.
+
+- Quick run:
+	- julia --project=benchmark benchmark/run.jl
+- Full comparison with PkgBenchmark:
+	- julia --project=benchmark -e 'using PkgBenchmark, CliffordAlgebras; benchmarkpkg(CliffordAlgebras)'
+
+See `benchmark/README.md` for details.
