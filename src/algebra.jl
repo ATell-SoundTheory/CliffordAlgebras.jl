@@ -81,7 +81,7 @@ end
 Generates a geometric algebra with signature (N,0,0).
 """
 function CliffordAlgebra(N::Integer)
-    @assert N>=0 "Algbra signature must be non-negative."
+    @assert N>=0 "Algebra signature must be non-negative."
     CliffordAlgebra(N, 0, 0, ntuple(i -> Symbol(:e, i), N))
 end
 
@@ -91,7 +91,7 @@ end
 Generates a geometric algebra with signature (Npos,Nneg,0).
 """
 function CliffordAlgebra(Npos::Integer, Nneg::Integer)
-    @assert Npos >= 0 && Nneg >= 0 "Algbra signature must be non-negative."
+    @assert Npos >= 0 && Nneg >= 0 "Algebra signature must be non-negative."
     CliffordAlgebra(Npos, Nneg, 0, ntuple(i -> Symbol(:e, i), Npos + Nneg))
 end
 
@@ -101,7 +101,7 @@ end
 Generates a geometric algebra with signature (Npos,Nneg,Nzero).
 """
 function CliffordAlgebra(Npos::Integer, Nneg::Integer, Nzero::Integer)
-    @assert Npos >= 0 && Nneg >= 0 && Nzero >= 0 "Algbra signature must be non-negative."
+    @assert Npos >= 0 && Nneg >= 0 && Nzero >= 0 "Algebra signature must be non-negative."
     CliffordAlgebra(Npos, Nneg, Nzero, ntuple(i -> Symbol(:e, i), Npos + Nneg + Nzero))
 end
 

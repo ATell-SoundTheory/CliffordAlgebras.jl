@@ -134,7 +134,47 @@ end
 """
     a * b
 
-Calculates the geometric product of two MultiVectors a and b.
+Compute the geometric product of multivectors `a` and `b`.
+
+The geometric product is the fundamental operation in Clifford algebra, combining
+the inner and outer products. It encodes both the magnitude and orientation
+relationships between multivectors.
+
+# Mathematical Definition
+The geometric product decomposes as:
+```
+a * b = a·b + a∧b
+```
+where `·` is the inner product and `∧` is the exterior product.
+
+# Properties
+- Associative: `(a * b) * c = a * (b * c)`
+- Distributive: `a * (b + c) = a * b + a * c`
+- Generally non-commutative: `a * b ≠ b * a` in general
+- For vectors: `u * v = u·v + u∧v`
+
+# Special Cases
+- Parallel vectors: `u * v = u·v` (pure scalar)
+- Orthogonal vectors: `u * v = u∧v` (pure bivector)
+- Same vector: `v * v = |v|²` (squared magnitude)
+
+# Examples
+```julia
+cl3 = CliffordAlgebra(3)
+e1, e2 = cl3.e1, cl3.e2
+
+# Vector geometric product
+u = 2*e1 + 3*e2
+v = 4*e1 + 5*e2
+result = u * v  # Returns scalar part (dot) + bivector part (wedge)
+
+# Basis vector products
+e1 * e1  # Returns 1 (squares to +1 in Euclidean signature)
+e1 * e2  # Returns e1e2 (creates bivector)
+e2 * e1  # Returns -e1e2 (anticommutative for orthogonal vectors)
+```
+
+See also: [`∧`](@ref), [`⋅`](@ref), [`⨼`](@ref), [`⨽`](@ref)
 """
 (*)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = geometricprod(a, b)
 (*)(a::Real, b::MultiVector) = mul_with_scalar(a,b)
@@ -153,7 +193,33 @@ end
 """
     a ∧ b
 
-Calculates the wedge product between two MultiVectors a and b.
+Compute the exterior (wedge) product of multivectors `a` and `b`.
+
+The exterior product is anti-commutative and associative, creating higher-grade elements.
+It represents the "oriented volume" spanned by the input multivectors.
+
+# Properties
+- Anti-commutative: `a ∧ b = -b ∧ a`
+- Associative: `(a ∧ b) ∧ c = a ∧ (b ∧ c)`
+- Nilpotent: `a ∧ a = 0` for any multivector
+- Grade additive: `grade(a ∧ b) = grade(a) + grade(b)` (for homogeneous multivectors)
+
+# Examples
+```julia
+cl3 = CliffordAlgebra(3)
+e1, e2, e3 = cl3.e1, cl3.e2, cl3.e3
+
+# Vector exterior products create bivectors (oriented areas)
+e1 ∧ e2  # Creates the e1e2 bivector
+
+# Bivector ∧ vector creates trivector (oriented volume) 
+(e1 ∧ e2) ∧ e3  # Creates the e1e2e3 trivector (pseudoscalar)
+
+# Self-exterior is always zero
+e1 ∧ e1  # Returns 0
+```
+
+See also: [`⋅`](@ref), [`⨼`](@ref), [`⨽`](@ref), [`*`](@ref)
 """
 (∧)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = exteriorprod(a, b)
 (∧)(a::MultiVector{CA}, b::Real) where {CA} = mul_with_scalar(b,a)
@@ -164,7 +230,40 @@ Calculates the wedge product between two MultiVectors a and b.
 """
     a ⋅ b
 
-Calculates the "fat dot" product between the MultiVectors a and b.
+Compute the "fat dot" product between multivectors `a` and `b`.
+
+The fat dot product is the symmetric part of the geometric product, extracting
+components where the grade difference is minimized. It's related to the 
+generalized inner product in geometric algebra.
+
+# Mathematical Definition
+For homogeneous multivectors of grades p and q:
+```
+a ⋅ b = ⟨ab⟩_{|p-q|}
+```
+
+# Properties
+- Symmetric: `a ⋅ b = b ⋅ a`
+- Linear in both arguments
+- Grade selective: extracts the |grade(a) - grade(b)| part
+
+# Examples
+```julia
+cl3 = CliffordAlgebra(3)
+e1, e2 = cl3.e1, cl3.e2
+
+# Vector dot product gives scalar
+v1 = e1 + e2
+v2 = 2*e1 + 3*e2
+scalar_part = v1 ⋅ v2  # Returns 5.0 (the scalar part)
+
+# Mixed grade operations
+bivector = e1 ∧ e2
+vector = e1
+result = bivector ⋅ vector  # Returns -e2
+```
+
+See also: [`∧`](@ref), [`⨼`](@ref), [`⨽`](@ref), [`⋆`](@ref)
 """
 (⋅)(a::MultiVector{CA}, b::MultiVector{CA}) where {CA} = fatdotprod(a, b)
 (⋅)(a::MultiVector{CA}, b::Real) where {CA} = mul_with_scalar(b,a)
