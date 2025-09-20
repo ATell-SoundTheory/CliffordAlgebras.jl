@@ -27,6 +27,5 @@ include("utils.jl")
 include("algebra.jl")
 include("multivector.jl")
 include("arithmetic.jl")
-include("precompile.jl")
 
 end
