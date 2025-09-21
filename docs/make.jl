@@ -19,6 +19,7 @@ makedocs(
         "Mathematical Background" => "mathematical_background.md",
         "Algebra Catalog" => "algebras.md",
     "Recipes" => "recipes.md",
+    "Cheat Sheet" => "cheatsheet.md",
         "Performance Guide" => "performance.md",
         "FAQ & Tips" => "faq.md",
         "Developer Guide" => "developer.md",

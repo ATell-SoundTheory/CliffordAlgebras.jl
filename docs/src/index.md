@@ -99,7 +99,7 @@ cga3d = CliffordAlgebra(:CGA3D)
 
 Tip: See “Typing Unicode operators” in the README for how to enter symbols like ∧, ⋅, ⨼, and ≀ in the REPL and editors.
 
-See also: the "Algebra Catalog" page for a table of predefined algebras, signatures, and base symbols, and the new "Recipes" page for practical CGA/PGA snippets.
+See also: the "Algebra Catalog" page for a table of predefined algebras, signatures, and base symbols, the new "Recipes" page for practical CGA/PGA snippets, and the "Cheat Sheet" for quick operator mappings and patterns.
 
 ## Working with Multivectors
 

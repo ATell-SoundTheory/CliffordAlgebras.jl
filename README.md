@@ -294,3 +294,4 @@ Additional docs:
 
 - Algebra Catalog: https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev/algebras/
 - Recipes (CGA/PGA): https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev/recipes/
+- Cheat Sheet: https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev/cheatsheet/
