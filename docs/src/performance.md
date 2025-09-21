@@ -2,6 +2,16 @@
 
 This guide provides tips and best practices for achieving optimal performance with CliffordAlgebras.jl.
 
+## Quick performance checklist
+
+- Prefer sparse operations; avoid unnecessary `extend()` in hot paths.
+- Keep operands in the same algebra type; avoid converting between algebras.
+- Reuse compiled structures: precompute rotors and reuse them.
+- Aim for type stability; use `@inferred` in performance-critical code.
+- Avoid excessive `prune()` calls; use it judiciously after larger expressions.
+- Choose the smallest algebra sufficient for the task (e.g., Cl(2) for 2D rotations).
+- Profile before optimizing; measure allocations and timing.
+
 ## Understanding the Design
 
 CliffordAlgebras.jl is designed for high performance through several key features:

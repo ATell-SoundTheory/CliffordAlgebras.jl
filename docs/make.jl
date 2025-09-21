@@ -17,6 +17,7 @@ makedocs(
         "Home" => "index.md",
         "Tutorial" => "tutorial.md", 
         "Mathematical Background" => "mathematical_background.md",
+        "Algebra Catalog" => "algebras.md",
         "Performance Guide" => "performance.md",
         "FAQ & Tips" => "faq.md",
         "Developer Guide" => "developer.md",

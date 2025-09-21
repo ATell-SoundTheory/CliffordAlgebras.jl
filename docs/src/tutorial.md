@@ -123,6 +123,27 @@ julia> (isgrade(rotated_v, 1), isapprox(norm(rotated_v), norm(v)))
 (true, true)
 ```
 
+### ASCII-only usage
+
+If typing Unicode operators is inconvenient, use the function forms:
+
+```jldoctest
+julia> using CliffordAlgebras; cl2 = CliffordAlgebra(2);
+
+julia> a = 1 + cl2.e1; b = 1 + cl2.e2;
+
+julia> gp = *(a, b);  # geometric product
+
+julia> wedge = CliffordAlgebras.exteriorprod(cl2.e1, cl2.e2);
+
+julia> dot = CliffordAlgebras.fatdotprod(a, b);
+
+julia> scalarpart = CliffordAlgebras.scalarprod(a, b);
+
+julia> (gp isa MultiVector) && (wedge == cl2.e1e2) && (scalar(scalarpart) isa Real)
+true
+```
+
 ## Lesson 7: Working with 3D Space
 
 Let's move to three dimensions:
@@ -146,6 +167,47 @@ println("I³² = ", I3 * I3)  # Should be -1
 # Duality operation
 dual_v = dual(v3d)
 println("Dual of vector: ", dual_v)
+```
+
+### Minimal PGA/CGA examples
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> pga = CliffordAlgebra(:PGA3D);
+
+julia> e0 = basevector(pga, :e0);  # null basis vector in PGA
+
+julia> scalar(e0*e0)
+0
+
+julia> cga = CliffordAlgebra(:CGA3D);
+
+julia> eplus = basevector(cga, :e₊); eminus = basevector(cga, :e₋);
+
+julia> (scalar(eplus*eplus), scalar(eminus*eminus))
+(1, -1)
+```
+
+### CGA: Euclidean rotation via rotor
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> cga = CliffordAlgebra(:CGA3D);
+
+julia> e1, e2 = basevector(cga, :e1), basevector(cga, :e2);
+
+julia> v = e1;  # unit vector along x
+
+julia> B = (π/4) * (e1 ∧ e2);  # rotate by 45° in the e1∧e2 plane
+
+julia> R = exp(B/2);
+
+julia> v_rot = R ≀ v;
+
+julia> isgrade(v_rot, 1) && isapprox(norm(v_rot), norm(v))
+true
 ```
 
 ## Lesson 8: Spacetime Algebra
