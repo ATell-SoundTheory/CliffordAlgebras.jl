@@ -274,3 +274,100 @@ julia> v = t + 0.1x + 0.2y;
 julia> vb = R ≀ v; true
 true
 ```
+
+## Advanced patterns
+
+### CGA: circle–line intersection (meet)
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> cga = CliffordAlgebra(:CGA3D);
+
+julia> e1, e2, e3 = basevector(cga,1), basevector(cga,2), basevector(cga,3);
+
+julia> C = (e1 ∧ e2) + (e2 ∧ e3);   # mock circle-like blade
+
+julia> L = e1 ∧ e2;                 # mock line-like blade
+
+julia> inter = C ∨ L; inter isa MultiVector; true
+true
+```
+
+### CGA: sphere–plane intersection (meet)
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> cga = CliffordAlgebra(:CGA3D);
+
+julia> e1, e2, e3 = basevector(cga,1), basevector(cga,2), basevector(cga,3);
+
+julia> S = (e1 ∧ e2 ∧ e3) + (e1 ∧ e2);  # mock sphere-like multivector
+
+julia> Π = e3;                           # mock plane-like blade
+
+julia> inter = S ∨ Π; inter isa MultiVector; true
+true
+```
+
+### PGA: projection and distance sketches
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> pga = CliffordAlgebra(:PGA3D);
+
+julia> e1, e2, e3 = basevector(pga,1), basevector(pga,2), basevector(pga,3);
+
+julia> line = e1 ∧ e2;   # x–y axis line-like
+
+julia> plane = e3;       # z=0 plane-like
+
+julia> v = e1 + 2e2 + 3e3;
+
+julia> proj_line = (line ⨼ v); proj_plane = (plane ⨼ v); true
+true
+```
+
+### Cl3/PGA: interpolate between rotations/motors
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> cl3 = CliffordAlgebra(3);
+
+julia> e1, e2, e3 = cl3.e1, cl3.e2, cl3.e3;
+
+julia> B1 = (π/8) * (e1 ∧ e2);
+
+julia> B2 = (π/5) * (e2 ∧ e3);
+
+julia> t = 0.3;
+
+julia> R = exp((1-t)*B1 + t*B2);
+
+julia> v = e1 + e2;
+
+julia> v2 = R ≀ v; true
+true
+```
+
+### STA: electromagnetic field transform under boost
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> sta = CliffordAlgebra(:Spacetime);
+
+julia> t, x, y, z = basevector(sta,:t), basevector(sta,:x), basevector(sta,:y), basevector(sta,:z);
+
+julia> F = (t ∧ x) + (y ∧ z);   # mock EM field bivector (E along x, B along x)
+
+julia> Bx = 0.1 * (t ∧ x);
+
+julia> R = exp(Bx);
+
+julia> Fp = R ≀ F; Fp isa MultiVector; true
+true
+```
