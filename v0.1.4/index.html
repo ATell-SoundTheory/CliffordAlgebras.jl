@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · CliffordAlgebras.jl Documentation</title><meta name="title" content="Home · CliffordAlgebras.jl Documentation"/><meta property="og:title" content="Home · CliffordAlgebras.jl Documentation"/><meta property="twitter:title" content="Home · CliffordAlgebras.jl Documentation"/><meta name="description" content="Documentation for CliffordAlgebras.jl Documentation."/><meta property="og:description" content="Documentation for CliffordAlgebras.jl Documentation."/><meta property="twitter:description" content="Documentation for CliffordAlgebras.jl Documentation."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>CliffordAlgebras.jl Documentation</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Overview"><span>Overview</span></a></li><li><a class="tocitem" href="#Quick-Start"><span>Quick Start</span></a></li><li><a class="tocitem" href="#Mathematical-Background"><span>Mathematical Background</span></a></li><li><a class="tocitem" href="#Creating-Algebras"><span>Creating Algebras</span></a></li><li><a class="tocitem" href="#Working-with-Multivectors"><span>Working with Multivectors</span></a></li><li><a class="tocitem" href="#Advanced-Features"><span>Advanced Features</span></a></li><li><a class="tocitem" href="#Performance-Considerations"><span>Performance Considerations</span></a></li><li><a class="tocitem" href="#Examples"><span>Examples</span></a></li></ul></li><li><a class="tocitem" href="tutorial/">Tutorial</a></li><li><a class="tocitem" href="mathematical_background/">Mathematical Background</a></li><li><a class="tocitem" href="algebras/">Algebra Catalog</a></li><li><a class="tocitem" href="recipes/">Recipes</a></li><li><a class="tocitem" href="cheatsheet/">Cheat Sheet</a></li><li><a class="tocitem" href="performance/">Performance Guide</a></li><li><a class="tocitem" href="faq/">FAQ &amp; Tips</a></li><li><a class="tocitem" href="developer/">Developer Guide</a></li><li><a class="tocitem" href="api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/ATell-SoundTheory/CliffordAlgebras.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/blob/master/docs/src/index.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="CliffordAlgebras.jl-Documentation"><a class="docs-heading-anchor" href="#CliffordAlgebras.jl-Documentation">CliffordAlgebras.jl Documentation</a><a id="CliffordAlgebras.jl-Documentation-1"></a><a class="docs-heading-anchor-permalink" href="#CliffordAlgebras.jl-Documentation" title="Permalink"></a></h1><p>A fast, lightweight and easy-to-use Julia package for Clifford Algebras and Geometric Algebras.</p><h2 id="Overview"><a class="docs-heading-anchor" href="#Overview">Overview</a><a id="Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Overview" title="Permalink"></a></h2><p>CliffordAlgebras.jl provides a comprehensive implementation of Clifford algebras (also known as geometric algebras) in Julia. The package uses compile-time code generation, sparse multivector representation, and special case identification to handle arbitrary geometric algebras efficiently.</p><h2 id="Quick-Start"><a class="docs-heading-anchor" href="#Quick-Start">Quick Start</a><a id="Quick-Start-1"></a><a class="docs-heading-anchor-permalink" href="#Quick-Start" title="Permalink"></a></h2><p>Install and load the package:</p><pre><code class="language-julia hljs">import Pkg
+Pkg.add(url=&quot;https://github.com/ATell-SoundTheory/CliffordAlgebras.jl&quot;)
+using CliffordAlgebras</code></pre><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; cl2 = CliffordAlgebra(2)
+Cl(2,0,0)
+
+julia&gt; e1, e2, e12 = cl2.e1, cl2.e2, cl2.e1e2;
+
+julia&gt; mv = 1 + 2*e1 + 3*e2 + 4*e12;
+
+julia&gt; mv * e1 isa MultiVector
+true
+
+julia&gt; e1 ∧ e2 == cl2.e1e2
+true</code></pre><h2 id="Mathematical-Background"><a class="docs-heading-anchor" href="#Mathematical-Background">Mathematical Background</a><a id="Mathematical-Background-1"></a><a class="docs-heading-anchor-permalink" href="#Mathematical-Background" title="Permalink"></a></h2><h3 id="Clifford-Algebras"><a class="docs-heading-anchor" href="#Clifford-Algebras">Clifford Algebras</a><a id="Clifford-Algebras-1"></a><a class="docs-heading-anchor-permalink" href="#Clifford-Algebras" title="Permalink"></a></h3><p>A Clifford algebra Cl(p,q,r) is an associative algebra over the real numbers with a signature (p,q,r), where:</p><ul><li>p = number of basis vectors that square to +1</li><li>q = number of basis vectors that square to -1  </li><li>r = number of basis vectors that square to 0</li></ul><p>The fundamental relation is the Clifford relation:</p><pre><code class="nohighlight hljs">eᵢeⱼ + eⱼeᵢ = 2ηᵢⱼ</code></pre><p>where ηᵢⱼ is the metric tensor.</p><h3 id="Multivectors"><a class="docs-heading-anchor" href="#Multivectors">Multivectors</a><a id="Multivectors-1"></a><a class="docs-heading-anchor-permalink" href="#Multivectors" title="Permalink"></a></h3><p>A general multivector in Cl(p,q,r) can be written as:</p><pre><code class="nohighlight hljs">M = α + aᵢeᵢ + aᵢⱼeᵢeⱼ + ... + a₁₂...ₙe₁e₂...eₙ</code></pre><p>The package represents multivectors using a sparse representation, storing only non-zero coefficients.</p><h2 id="Creating-Algebras"><a class="docs-heading-anchor" href="#Creating-Algebras">Creating Algebras</a><a id="Creating-Algebras-1"></a><a class="docs-heading-anchor-permalink" href="#Creating-Algebras" title="Permalink"></a></h2><h3 id="Basic-Signatures"><a class="docs-heading-anchor" href="#Basic-Signatures">Basic Signatures</a><a id="Basic-Signatures-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Signatures" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Euclidean algebras
+cl2 = CliffordAlgebra(2)        # Cl(2,0,0)
+cl3 = CliffordAlgebra(3)        # Cl(3,0,0)
+
+# Mixed signatures
+spa = CliffordAlgebra(1,3)      # Cl(1,3,0) - Spacetime algebra
+pga = CliffordAlgebra(3,0,1)    # Cl(3,0,1) - Projective geometric algebra
+
+# Full signature specification
+custom = CliffordAlgebra(2,1,1) # Cl(2,1,1)</code></pre><h3 id="Predefined-Algebras"><a class="docs-heading-anchor" href="#Predefined-Algebras">Predefined Algebras</a><a id="Predefined-Algebras-1"></a><a class="docs-heading-anchor-permalink" href="#Predefined-Algebras" title="Permalink"></a></h3><p>The package includes many commonly used algebras:</p><pre><code class="language-julia hljs"># Complex numbers
+ℂ = CliffordAlgebra(:Complex)
+
+# Quaternions  
+ℍ = CliffordAlgebra(:Quaternions)
+
+# Spacetime algebra
+sta = CliffordAlgebra(:Spacetime)
+
+# Projective geometric algebras
+pga2d = CliffordAlgebra(:PGA2D)
+pga3d = CliffordAlgebra(:PGA3D)
+
+# Conformal geometric algebras
+cga2d = CliffordAlgebra(:CGA2D)
+cga3d = CliffordAlgebra(:CGA3D)</code></pre><p>Tip: See “Typing Unicode operators” in the README for how to enter symbols like ∧, ⋅, ⨼, and ≀ in the REPL and editors.</p><p>See also: the &quot;Algebra Catalog&quot; page for a table of predefined algebras, signatures, and base symbols, the new &quot;Recipes&quot; page for practical CGA/PGA snippets, and the &quot;Cheat Sheet&quot; for quick operator mappings and patterns.</p><h2 id="Working-with-Multivectors"><a class="docs-heading-anchor" href="#Working-with-Multivectors">Working with Multivectors</a><a id="Working-with-Multivectors-1"></a><a class="docs-heading-anchor-permalink" href="#Working-with-Multivectors" title="Permalink"></a></h2><h3 id="Creating-Multivectors"><a class="docs-heading-anchor" href="#Creating-Multivectors">Creating Multivectors</a><a id="Creating-Multivectors-1"></a><a class="docs-heading-anchor-permalink" href="#Creating-Multivectors" title="Permalink"></a></h3><pre><code class="language-julia hljs">cl3 = CliffordAlgebra(3)
+
+# From scalar
+scalar_mv = MultiVector(cl3, 5.0)
+
+# From basis vectors
+mv1 = cl3.e1 + 2*cl3.e2 + 3*cl3.e1e2
+
+# From vector components
+vector_mv = MultiVector(cl3, (1.0, 2.0, 3.0))</code></pre><h3 id="Operations"><a class="docs-heading-anchor" href="#Operations">Operations</a><a id="Operations-1"></a><a class="docs-heading-anchor-permalink" href="#Operations" title="Permalink"></a></h3><h4 id="Geometric-Product-(*)"><a class="docs-heading-anchor" href="#Geometric-Product-(*)">Geometric Product (*)</a><a id="Geometric-Product-(*)-1"></a><a class="docs-heading-anchor-permalink" href="#Geometric-Product-(*)" title="Permalink"></a></h4><p>The fundamental operation in Clifford algebra:</p><pre><code class="language-julia hljs">result = mv1 * mv2</code></pre><h4 id="Exterior-Product-()"><a class="docs-heading-anchor" href="#Exterior-Product-()">Exterior Product (∧)</a><a id="Exterior-Product-()-1"></a><a class="docs-heading-anchor-permalink" href="#Exterior-Product-()" title="Permalink"></a></h4><p>Anti-commutative product that creates higher-grade elements:</p><pre><code class="language-julia hljs">bivector = cl3.e1 ∧ cl3.e2  # Creates e1e2</code></pre><p>If you prefer ASCII, you can use function names instead of Unicode operators, e.g. <code>exteriorprod(mv1, mv2)</code> for <code>mv1 ∧ mv2</code>.</p><h4 id="Interior-Products"><a class="docs-heading-anchor" href="#Interior-Products">Interior Products</a><a id="Interior-Products-1"></a><a class="docs-heading-anchor-permalink" href="#Interior-Products" title="Permalink"></a></h4><p>Various contraction operations:</p><pre><code class="language-julia hljs">left_contraction = mv1 ⨼ mv2   # Left contraction
+right_contraction = mv1 ⨽ mv2  # Right contraction
+fat_dot = mv1 ⋅ mv2            # Fat dot product
+scalar_product = mv1 ⋆ mv2     # Scalar product</code></pre><h4 id="Involutions"><a class="docs-heading-anchor" href="#Involutions">Involutions</a><a id="Involutions-1"></a><a class="docs-heading-anchor-permalink" href="#Involutions" title="Permalink"></a></h4><pre><code class="language-julia hljs">reverse_mv = ~mv1              # Reverse (grade involution)
+conjugate_mv = conj(mv1)       # Clifford conjugation
+grade_inv = grin(mv1)          # Grade involution
+dual_mv = dual(mv1)            # Hodge dual</code></pre><h3 id="Grade-Operations"><a class="docs-heading-anchor" href="#Grade-Operations">Grade Operations</a><a id="Grade-Operations-1"></a><a class="docs-heading-anchor-permalink" href="#Grade-Operations" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Extract specific grades
+scalar_part = scalar(mv)
+grade_2 = grade(mv, 2)
+even_part = even(mv)
+odd_part = odd(mv)
+
+# Grade queries
+is_vector = isgrade(mv, 1)
+max_grade_mv, max_g = maxgrade(mv)</code></pre><h2 id="Advanced-Features"><a class="docs-heading-anchor" href="#Advanced-Features">Advanced Features</a><a id="Advanced-Features-1"></a><a class="docs-heading-anchor-permalink" href="#Advanced-Features" title="Permalink"></a></h2><h3 id="Exponential-and-Trigonometric-Functions"><a class="docs-heading-anchor" href="#Exponential-and-Trigonometric-Functions">Exponential and Trigonometric Functions</a><a id="Exponential-and-Trigonometric-Functions-1"></a><a class="docs-heading-anchor-permalink" href="#Exponential-and-Trigonometric-Functions" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Exponential of bivector (rotation)
+B = π/4 * cl3.e1e2
+rotor = exp(B)
+
+# Apply rotation using sandwich product
+rotated_vector = rotor ≀ cl3.e3</code></pre><h3 id="Matrix-Representation"><a class="docs-heading-anchor" href="#Matrix-Representation">Matrix Representation</a><a id="Matrix-Representation-1"></a><a class="docs-heading-anchor-permalink" href="#Matrix-Representation" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Convert to matrix form
+matrix_form = matrix(mv)
+vector_form = vector(mv)
+
+# Matrix multiplication is equivalent to geometric product
+@assert matrix(mv1) * matrix(mv2) == matrix(mv1 * mv2)</code></pre><h3 id="Outermorphisms"><a class="docs-heading-anchor" href="#Outermorphisms">Outermorphisms</a><a id="Outermorphisms-1"></a><a class="docs-heading-anchor-permalink" href="#Outermorphisms" title="Permalink"></a></h3><p>Apply linear transformations to the underlying vector space:</p><pre><code class="language-julia hljs"># 2x2 rotation matrix
+θ = π/4
+R = [cos(θ) -sin(θ); sin(θ) cos(θ)]
+
+# Apply to multivector
+transformed_mv = outermorphism(R, mv)</code></pre><h2 id="Performance-Considerations"><a class="docs-heading-anchor" href="#Performance-Considerations">Performance Considerations</a><a id="Performance-Considerations-1"></a><a class="docs-heading-anchor-permalink" href="#Performance-Considerations" title="Permalink"></a></h2><h3 id="Sparse-Representation"><a class="docs-heading-anchor" href="#Sparse-Representation">Sparse Representation</a><a id="Sparse-Representation-1"></a><a class="docs-heading-anchor-permalink" href="#Sparse-Representation" title="Permalink"></a></h3><p>The package automatically uses sparse representation for efficiency:</p><pre><code class="language-julia hljs"># Only stores non-zero coefficients
+sparse_mv = cl3.e1 + cl3.e1e2e3  # Only 2 coefficients stored</code></pre><h3 id="Type-Stability"><a class="docs-heading-anchor" href="#Type-Stability">Type Stability</a><a id="Type-Stability-1"></a><a class="docs-heading-anchor-permalink" href="#Type-Stability" title="Permalink"></a></h3><p>Most operations are type-stable for optimal performance:</p><pre><code class="language-julia hljs"># These operations are typically type-stable
+@inferred mv1 * mv2
+@inferred exp(bivector)
+@inferred ~mv1</code></pre><h3 id="Generated-Functions"><a class="docs-heading-anchor" href="#Generated-Functions">Generated Functions</a><a id="Generated-Functions-1"></a><a class="docs-heading-anchor-permalink" href="#Generated-Functions" title="Permalink"></a></h3><p>The package uses <code>@generated</code> functions for compile-time optimization, ensuring efficient code for each algebra and multivector type.</p><h2 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h2><h3 id="2D-Rotations"><a class="docs-heading-anchor" href="#2D-Rotations">2D Rotations</a><a id="2D-Rotations-1"></a><a class="docs-heading-anchor-permalink" href="#2D-Rotations" title="Permalink"></a></h3><pre><code class="language-julia hljs">cl2 = CliffordAlgebra(2)
+
+# Create a vector
+v = cl2.e1
+
+# Create rotation bivector (π/4 rotation)
+B = π/4 * cl2.e1e2
+
+# Create rotor
+R = exp(B)
+
+# Apply rotation
+rotated_v = R ≀ v</code></pre><h3 id="3D-Spacetime"><a class="docs-heading-anchor" href="#3D-Spacetime">3D Spacetime</a><a id="3D-Spacetime-1"></a><a class="docs-heading-anchor-permalink" href="#3D-Spacetime" title="Permalink"></a></h3><pre><code class="language-julia hljs">sta = CliffordAlgebra(:Spacetime)  # Cl(1,3,0)
+
+# Create spacetime vector
+event = sta.t + 2*sta.x + 3*sta.y + 4*sta.z
+
+# Compute spacetime interval
+interval = scalar(event * ~event)</code></pre></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Sunday 21 September 2025 12:46">Sunday 21 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
