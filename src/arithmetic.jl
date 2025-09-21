@@ -561,9 +561,11 @@ Calculates the MultiVector squared norm defined as grade(mv*reverse(mv),0)
 end
 
 function baseblade_sqr(CA::Type{<:CliffordAlgebra}, x::NTuple)::Int
-    prod(x, init=1) do i
-        basesignature(CA,i)
+    acc = 1
+    for i in x
+        acc *= basesignature(CA, i)
     end
+    acc
 end
 
 """
@@ -793,14 +795,22 @@ end
 
 function exp_trig(mv::MultiVector)
     T = float(eltype(mv))
-    x = sqrt(sum(coefficients(mv) .^ 2, init=zero(T)))
+    s = zero(T)
+    for c in coefficients(mv)
+        s += c*c
+    end
+    x = sqrt(s)
     s,c = sincos(x)
     return c + s * mv * inv0(x)
 end
 
 function exp_hyp(mv::MultiVector)
     T = float(eltype(mv))
-    x = sqrt(sum(coefficients(mv) .^ 2, init=zero(T)))
+    s = zero(T)
+    for c in coefficients(mv)
+        s += c*c
+    end
+    x = sqrt(s)
     return cosh(x) + sinh(x) * mv * inv0(x)
 end
 

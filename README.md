@@ -15,6 +15,24 @@ CliffordAlgebras.jl uses compile time code generation, sparse multivector repres
 
 CliffordAlgebras provides a low level implementation that is common to all Clifford algebras. Functions that are specific to certain algebras can be added on top using the tools provided here.
 
+## Installation
+
+Install via the Julia package manager:
+
+```julia
+import Pkg
+Pkg.add(url="https://github.com/ATell-SoundTheory/CliffordAlgebras.jl")
+```
+
+Or develop locally during experimentation:
+
+```julia
+import Pkg
+Pkg.develop(path="/absolute/path/to/CliffordAlgebras.jl")
+```
+
+Minimum Julia version: 1.6
+
 Generate a Clifford algebra:
 
 ```
@@ -234,13 +252,38 @@ julia> outermorphism(M, mv1)
 +1.0+2.0×e2-1.0×e1e2 ∈ Cl(2, 0, 0)
 ```
 
+## Typing Unicode operators in Julia
+
+This package exports several Unicode operators like `∧ ∨ ⋅ ⨼ ⨽ ⋆ ×₋ ×₊ ≀`. In the Julia REPL and most editors, you can type them using LaTeX-style tab completions, for example:
+
+- `\wedge<Tab>` → `∧`
+- `\vee<Tab>` → `∨`
+- `\cdot<Tab>` → `⋅`
+- `\lrcorner<Tab>` → `⨼` (left contraction)
+- `\llcorner<Tab>` → `⨽` (right contraction)
+- `\star<Tab>` → `⋆`
+- `\times<Tab>\_ -<Tab>` → `×₋` (commutator)
+- `\times<Tab>\_ +<Tab>` → `×₊` (anti-commutator)
+- `\Vert<Tab>` → `≀` (sandwich)
+
+As a non-Unicode fallback, you can call the corresponding functions directly:
+
+- `exteriorprod(a,b)` for `a ∧ b`
+- `fatdotprod(a,b)` for `a ⋅ b`
+- `leftcontractionprod(a,b)` for `a ⨼ b`
+- `rightcontractionprod(a,b)` for `a ⨽ b`
+- `scalarprod(a,b)` for `a ⋆ b`
+- `commutatorprod(a,b)` for `a ×₋ b`
+- `anticommutatorprod(a,b)` for `a ×₊ b`
+- `sandwichproduct(a,b)` for `a ≀ b`
+
 ## Benchmarks
 
 This repo includes a small benchmark suite in `benchmark/`.
 
 - Quick run:
-	- julia --project=benchmark benchmark/run.jl
+  - julia --project=benchmark benchmark/run.jl
 - Full comparison with PkgBenchmark:
-	- julia --project=benchmark -e 'using PkgBenchmark, CliffordAlgebras; benchmarkpkg(CliffordAlgebras)'
+  - julia --project=benchmark -e 'using PkgBenchmark, CliffordAlgebras; benchmarkpkg(CliffordAlgebras)'
 
 See `benchmark/README.md` for details.

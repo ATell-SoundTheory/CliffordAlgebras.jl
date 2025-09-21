@@ -18,6 +18,7 @@ makedocs(
         "Tutorial" => "tutorial.md", 
         "Mathematical Background" => "mathematical_background.md",
         "Performance Guide" => "performance.md",
+        "FAQ & Tips" => "faq.md",
         "Developer Guide" => "developer.md",
         "API Reference" => "api.md",
     ],

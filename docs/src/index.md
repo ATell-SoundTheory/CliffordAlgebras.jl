@@ -8,6 +8,14 @@ CliffordAlgebras.jl provides a comprehensive implementation of Clifford algebras
 
 ## Quick Start
 
+Install and load the package:
+
+```julia
+import Pkg
+Pkg.add(url="https://github.com/ATell-SoundTheory/CliffordAlgebras.jl")
+using CliffordAlgebras
+```
+
 ```jldoctest
 julia> using CliffordAlgebras
 
@@ -89,6 +97,8 @@ cga2d = CliffordAlgebra(:CGA2D)
 cga3d = CliffordAlgebra(:CGA3D)
 ```
 
+Tip: See “Typing Unicode operators” in the README for how to enter symbols like ∧, ⋅, ⨼, and ≀ in the REPL and editors.
+
 ## Working with Multivectors
 
 ### Creating Multivectors
@@ -119,6 +129,8 @@ Anti-commutative product that creates higher-grade elements:
 ```julia
 bivector = cl3.e1 ∧ cl3.e2  # Creates e1e2
 ```
+
+If you prefer ASCII, you can use function names instead of Unicode operators, e.g. `exteriorprod(mv1, mv2)` for `mv1 ∧ mv2`.
 
 #### Interior Products
 Various contraction operations:
