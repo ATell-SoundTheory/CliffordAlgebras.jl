@@ -25,7 +25,8 @@ ops = Dict{String,Function}(
 )
 
 for (name, thunk) in ops
-    trial = @benchmarkable thunk() samples=10 evals=1 seconds=0.2
-    res = run(trial)
-    println(name, ": median = ", BenchmarkTools.median(res))
+    # Bind to a local and interpolate into @belapsed to avoid scope issues
+    local f = thunk
+    t = @belapsed $f()
+    println(name, ": ", round(t*1e6; digits=2), " μs")
 end
