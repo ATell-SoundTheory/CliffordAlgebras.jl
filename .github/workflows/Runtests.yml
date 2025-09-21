@@ -18,6 +18,12 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
+      - name: Remove Manifest for Julia 1.6
+        if: matrix.julia-version == '1.6'
+        shell: bash
+        run: |
+          echo "Removing top-level Manifest.toml for Julia 1.6 to avoid cross-version resolution issues"
+          rm -f Manifest.toml
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
