@@ -1,5 +1,7 @@
 [![Tests](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Runtests.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Runtests.yml)
 [![Documentation](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Documenter.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Documenter.yml)
+[![Aqua](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Aqua.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/Aqua.yml)
+[![BenchSmoke](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/BenchSmoke.yml/badge.svg)](https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/actions/workflows/BenchSmoke.yml)
 
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://atell-soundtheory.github.io/CliffordAlgebras.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev)
@@ -287,3 +289,8 @@ This repo includes a small benchmark suite in `benchmark/`.
   - julia --project=benchmark -e 'using PkgBenchmark, CliffordAlgebras; benchmarkpkg(CliffordAlgebras)'
 
 See `benchmark/README.md` for details.
+
+Additional docs:
+
+- Algebra Catalog: https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev/algebras/
+- Recipes (CGA/PGA): https://atell-soundtheory.github.io/CliffordAlgebras.jl/dev/recipes/

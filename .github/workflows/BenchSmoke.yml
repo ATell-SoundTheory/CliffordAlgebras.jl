@@ -1,0 +1,14 @@
+name: BenchSmoke
+on:
+  push:
+  pull_request:
+jobs:
+  bench-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1'
+      - name: Run benchmark smoke
+        run: julia --project=benchmark benchmark/smoke.jl

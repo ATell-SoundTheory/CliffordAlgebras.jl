@@ -1,6 +1,8 @@
 using Test
 
-if VERSION >= v"1.8"
+# Run Aqua locally on Julia >= 1.8. In CI, only run Aqua if AQUA_ONLY=true to avoid
+# duplicating checks in the main test matrix. This keeps 1.6 CI clean and Aqua isolated.
+if VERSION >= v"1.8" && (get(ENV, "CI", "") != "true" || get(ENV, "AQUA_ONLY", "false") == "true")
     using Aqua
     using CliffordAlgebras
     @testset "Aqua.jl" begin
@@ -15,5 +17,5 @@ if VERSION >= v"1.8"
         )
     end
 else
-    @info "Skipping Aqua tests on Julia < 1.8"
+    @info "Skipping Aqua tests (either Julia < 1.8 or CI main job without AQUA_ONLY)"
 end

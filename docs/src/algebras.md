@@ -1,6 +1,6 @@
 # Algebra Catalog
 
-This page lists predefined algebra aliases available in `CliffordAlgebras.jl`, along with their signatures and notes.
+This page lists predefined algebra aliases available in `CliffordAlgebras.jl`, along with their signatures and quick facts.
 
 | Alias(es) | Signature (p,q,r) | Base symbols | Notes |
 |---|---:|---|---|
@@ -23,6 +23,20 @@ This page lists predefined algebra aliases available in `CliffordAlgebras.jl`, a
 | `:QCGA`, `:QuadricConformal` | (9,6,0) | — | Quadric conformal |
 
 Tip: Use `signaturetable(stdout, algebra)` to view per-basis signatures and `cayleytable(stdout, algebra)` for the full multiplication table.
+
+## Quick facts and size
+
+For an algebra with signature (p,q,r) and order n = p+q+r:
+
+- Dimension of the full algebra: 2^n elements.
+- Number of k-vectors (grade k): C(n,k).
+- Pseudoscalar I has grade n and I^2 = character(algebra) ∈ {+1,-1,0}.
+- Null basis elements (r > 0) square to 0 and model points at infinity or conformal components.
+
+Examples:
+- Cl(3): n=3, dim=8, grades per k: 1, 3, 3, 1.
+- PGA3D (3,0,1): n=4, dim=16, with one null basis e0.
+- CGA3D (4,1,0): n=5, dim=32, two lightlike directions from e₊, e₋.
 
 ## Typical use cases
 

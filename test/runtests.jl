@@ -1,9 +1,17 @@
 using CliffordAlgebras
 using Test
 include("aqua.jl")
+
+# Allow CI to run an Aqua-only job by setting AQUA_ONLY=true.
+# When AQUA_ONLY is set, skip the main testsets to avoid duplication.
+const AQUA_ONLY = get(ENV, "AQUA_ONLY", "false") == "true"
 import LinearAlgebra.SingularException
 
 @testset "CliffordAlgebras.jl" begin
+    if AQUA_ONLY
+        @info "Skipping main test suite because AQUA_ONLY=true"
+        return
+    end
     @testset "inference pga3d" begin
         pga = CliffordAlgebra(3,0,1)
         @inferred MultiVector(pga, 1.0)

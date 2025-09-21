@@ -1,0 +1,24 @@
+name: Aqua
+on:
+  push:
+  pull_request:
+jobs:
+  aqua:
+    name: "Aqua checks Julia ${{ matrix.julia-version }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: ['1.8', '1']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+      - uses: julia-actions/cache@v1
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: Run Aqua-only tests
+        env:
+          AQUA_ONLY: "true"
+          CI: "true"
+        run: julia --project -e 'using Pkg; Pkg.test();'
