@@ -2,7 +2,6 @@
 
 import Base.show
 import Combinatorics.levicivita
-import PrettyTables.pretty_table
 
 """
 Internal cache for multiplication tables keyed by the CliffordAlgebra type.
@@ -333,7 +332,7 @@ function cayleytable(io::IO, CA::Type{<:CliffordAlgebra})
         end
     end
     lines = vcat(0, cumsum([binomial(order(CA), i) for i = 0:order(CA)]))
-    pretty_table(
+    _render_table(
         io,
         table;
         show_row_number = false,
@@ -362,17 +361,106 @@ function signaturetable(io::IO, CA::Type{<:CliffordAlgebra})
         table[n,1] = string(s)
         table[n,2] = sig == +1 ? "+1" : sig == -1 ? "-1" : "0"
     end
-    pretty_table(
+    _render_table(
         io,
         table;
         show_row_number = false,
         crop = :none,
         show_header = false,
-        alignment = :c
+        alignment = :c,
     )
 end
 
 function show(io::IO, ca::CliffordAlgebra)
     (Np, Nn, Nz) = signature(ca)
     print(io, "Cl(", Np, ",", Nn, ",", Nz, ")")
+end
+
+# --- Internal fallback table renderer ---
+# This minimal renderer avoids a hard dependency on PrettyTables. A package
+# extension can provide a more specific method that delegates to PrettyTables.
+function _render_table(
+    io::IO,
+    table;
+    show_row_number::Bool = false,
+    crop = :none,
+    show_header::Bool = false,
+    alignment = :c,
+    vlines = nothing,
+    hlines = nothing,
+)
+    nrows, ncols = size(table)
+    # compute column widths (max textwidth per column)
+    widths = fill(0, ncols)
+    for j in 1:ncols
+        maxw = 0
+        for i in 1:nrows
+            w = textwidth(String(table[i,j]))
+            if w > maxw
+                maxw = w
+            end
+        end
+        widths[j] = maxw
+    end
+    # Normalize line positions
+    vset = Set{Int}()
+    if vlines === nothing
+        # default: separators at all column boundaries (PrettyTables default)
+        for k in 0:ncols
+            push!(vset, k)
+        end
+    else
+        foreach(x -> (0 <= x <= ncols) && push!(vset, x), vlines)
+        push!(vset, 0, ncols)
+    end
+    hset = Set{Int}()
+    if hlines === nothing
+        push!(hset, 0, nrows)
+    else
+        foreach(x -> (0 <= x <= nrows) && push!(hset, x), hlines)
+        push!(hset, 0, nrows)
+    end
+    # helpers to draw border lines
+    function _border_line(left::Char, mid::Char, inter::Char, right::Char)
+        print(io, left)
+        for j in 1:ncols
+            print(io, repeat('─', widths[j] + 2))
+            if j in vset && j < ncols
+                print(io, inter)
+            end
+        end
+        println(io, right)
+    end
+    # top border
+    _border_line('┌', '─', '┬', '┐')
+    # rows
+    for i in 1:nrows
+        # content line
+        print(io, '│')
+        for j in 1:ncols
+            cell = String(table[i,j])
+            pad = widths[j] - textwidth(cell)
+            if alignment == :c
+                lpad = pad ÷ 2
+                rpad = pad - lpad
+                print(io, ' ', repeat(' ', lpad), cell, repeat(' ', rpad), ' ')
+            elseif alignment == :r
+                print(io, ' ', repeat(' ', pad), cell, ' ')
+            else
+                # :l or any other
+                print(io, ' ', cell, repeat(' ', pad), ' ')
+            end
+            if j in vset && j < ncols
+                print(io, '│')
+            end
+        end
+        println(io, '│')
+        # horizontal separator after this row if requested (but not after last row; bottom border will be drawn)
+        if i in hset && i < nrows
+            _border_line('├', '─', '┼', '┤')
+        end
+    end
+    # bottom border
+    _border_line('└', '─', '┴', '┘')
+    nothing
 end

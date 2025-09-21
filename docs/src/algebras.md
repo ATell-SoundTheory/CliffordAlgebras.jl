@@ -22,7 +22,7 @@ This page lists predefined algebra aliases available in `CliffordAlgebras.jl`, a
 | `:DCGSTA`, `:DoubleConformalSpacetime` | (4,8,0) | `(:t₁, :t₂, :e₊₁, :e₊₂, :x₁, :x₂, :y₁, :y₂, :z₁, :z₂, :e₋₁, :e₋₂)` | DCG for spacetime |
 | `:QCGA`, `:QuadricConformal` | (9,6,0) | — | Quadric conformal |
 
-Tip: Use `signaturetable(stdout, algebra)` to view per-basis signatures and `cayleytable(stdout, algebra)` for the full multiplication table.
+Tip: Use `signaturetable(stdout, algebra)` to view per-basis signatures and `cayleytable(stdout, algebra)` for the full multiplication table. If the `PrettyTables` package is available in your environment, these functions render via a package extension; otherwise, a Unicode fallback renderer is used.
 
 ## Quick facts and size
 

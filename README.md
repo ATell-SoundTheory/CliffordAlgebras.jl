@@ -17,6 +17,8 @@ CliffordAlgebras.jl uses compile time code generation, sparse multivector repres
 
 CliffordAlgebras provides a low level implementation that is common to all Clifford algebras. Functions that are specific to certain algebras can be added on top using the tools provided here.
 
+Optional integrations: PrettyTables is supported via a package extension. If PrettyTables is present in your environment, `cayleytable` and `signaturetable` use it for rendering; otherwise, a Unicode fallback renderer is used with the same layout tested in CI.
+
 ## Installation
 
 Install via the Julia package manager:
@@ -34,6 +36,13 @@ Pkg.develop(path="/absolute/path/to/CliffordAlgebras.jl")
 ```
 
 Minimum Julia version: 1.6
+
+PrettyTables extension (optional):
+
+```julia
+import Pkg
+Pkg.add("PrettyTables") # enables PrettyTables-backed table rendering via extension
+```
 
 Generate a Clifford algebra:
 
