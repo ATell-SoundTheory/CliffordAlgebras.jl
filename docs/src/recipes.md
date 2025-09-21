@@ -211,3 +211,66 @@ true
 - Use `matrix(mv)` and `vector(mv)` for sanity checks against linear algebra operations.
 - Prefer small angles and normalized elements in doctests to keep outputs stable.
 - When doctests are sensitive to printed formatting, write to an IOBuffer and assert `true`.
+
+## More small patterns
+
+### PGA: motor inverse round-trip
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> pga = CliffordAlgebra(:PGA3D);
+
+julia> e1, e2, e3, e0 = basevector(pga,1), basevector(pga,2), basevector(pga,3), basevector(pga,:e0);
+
+julia> B = (π/10) * (e1 ∧ e2);
+
+julia> T = 0.02 * (e0 ∧ e1);
+
+julia> M = exp(B + T);
+
+julia> v = e1 + 0.3e2 + 0.2e3;
+
+julia> v_back = (~M) ≀ (M ≀ v); true
+true
+```
+
+### Cl3: simple rotation around z-axis
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> cl3 = CliffordAlgebra(3);
+
+julia> e1, e2, e3 = cl3.e1, cl3.e2, cl3.e3;
+
+julia> B = (π/3) * (e1 ∧ e2);
+
+julia> R = exp(B);
+
+julia> v = e1;
+
+julia> v_rot = R ≀ v; true
+true
+```
+
+### STA: compose small boosts
+
+```jldoctest
+julia> using CliffordAlgebras
+
+julia> sta = CliffordAlgebra(:Spacetime);
+
+julia> t, x, y = basevector(sta,:t), basevector(sta,:x), basevector(sta,:y);
+
+julia> Bx = 0.05 * (t ∧ x);
+
+julia> By = 0.03 * (t ∧ y);
+
+julia> R = exp(By) * exp(Bx);
+
+julia> v = t + 0.1x + 0.2y;
+
+julia> vb = R ≀ v; true
+true
+```
