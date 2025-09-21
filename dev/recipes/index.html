@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Recipes · CliffordAlgebras.jl Documentation</title><meta name="title" content="Recipes · CliffordAlgebras.jl Documentation"/><meta property="og:title" content="Recipes · CliffordAlgebras.jl Documentation"/><meta property="twitter:title" content="Recipes · CliffordAlgebras.jl Documentation"/><meta name="description" content="Documentation for CliffordAlgebras.jl Documentation."/><meta property="og:description" content="Documentation for CliffordAlgebras.jl Documentation."/><meta property="twitter:description" content="Documentation for CliffordAlgebras.jl Documentation."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">CliffordAlgebras.jl Documentation</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../tutorial/">Tutorial</a></li><li><a class="tocitem" href="../mathematical_background/">Mathematical Background</a></li><li><a class="tocitem" href="../algebras/">Algebra Catalog</a></li><li class="is-active"><a class="tocitem" href>Recipes</a><ul class="internal"><li><a class="tocitem" href="#Contract"><span>Contract</span></a></li><li><a class="tocitem" href="#PGA:-reflect-a-vector-in-a-plane-(householder-like)"><span>PGA: reflect a vector in a plane (householder-like)</span></a></li><li><a class="tocitem" href="#PGA:-intersection-of-two-planes-line"><span>PGA: intersection of two planes -&gt; line</span></a></li><li><a class="tocitem" href="#PGA:-reflect-a-vector-in-a-plane"><span>PGA: reflect a vector in a plane</span></a></li><li><a class="tocitem" href="#PGA:-line-plane-meet-point"><span>PGA: line-plane meet -&gt; point</span></a></li><li><a class="tocitem" href="#PGA:-rigid-body-motor-(rotation-translation)"><span>PGA: rigid-body motor (rotation + translation)</span></a></li><li><a class="tocitem" href="#Cl3:-compose-two-rotations-via-rotors"><span>Cl3: compose two rotations via rotors</span></a></li><li><a class="tocitem" href="#STA:-Lorentz-boost-via-bivector-exponential"><span>STA: Lorentz boost via bivector exponential</span></a></li><li><a class="tocitem" href="#CGA:-rotate-a-Euclidean-vector-by-a-rotor"><span>CGA: rotate a Euclidean vector by a rotor</span></a></li><li><a class="tocitem" href="#CGA:-translate-a-point-using-a-motor-(CGA-screw-motion)"><span>CGA: translate a point using a motor (CGA screw motion)</span></a></li><li><a class="tocitem" href="#Tips"><span>Tips</span></a></li></ul></li><li><a class="tocitem" href="../performance/">Performance Guide</a></li><li><a class="tocitem" href="../faq/">FAQ &amp; Tips</a></li><li><a class="tocitem" href="../developer/">Developer Guide</a></li><li><a class="tocitem" href="../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Recipes</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Recipes</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/ATell-SoundTheory/CliffordAlgebras.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/ATell-SoundTheory/CliffordAlgebras.jl/blob/master/docs/src/recipes.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Recipes:-CGA-and-PGA"><a class="docs-heading-anchor" href="#Recipes:-CGA-and-PGA">Recipes: CGA &amp; PGA</a><a id="Recipes:-CGA-and-PGA-1"></a><a class="docs-heading-anchor-permalink" href="#Recipes:-CGA-and-PGA" title="Permalink"></a></h1><p>This page collects small, practical recipes for common tasks in projective and conformal geometric algebra.</p><p>All snippets are doctest-able and ASCII-friendly where possible.</p><h2 id="Contract"><a class="docs-heading-anchor" href="#Contract">Contract</a><a id="Contract-1"></a><a class="docs-heading-anchor-permalink" href="#Contract" title="Permalink"></a></h2><ul><li>Input: an algebra and a few multivectors</li><li>Output: a result multivector of interest</li><li>Errors: invalid signatures or division by zero where noted</li><li>Success: example evaluates and type-stable on recent Julia</li></ul><h2 id="PGA:-reflect-a-vector-in-a-plane-(householder-like)"><a class="docs-heading-anchor" href="#PGA:-reflect-a-vector-in-a-plane-(householder-like)">PGA: reflect a vector in a plane (householder-like)</a><a id="PGA:-reflect-a-vector-in-a-plane-(householder-like)-1"></a><a class="docs-heading-anchor-permalink" href="#PGA:-reflect-a-vector-in-a-plane-(householder-like)" title="Permalink"></a></h2><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; pga = CliffordAlgebra(:PGA3D);
+
+julia&gt; e1, e2, e3 = basevector(pga,1), basevector(pga,2), basevector(pga,3);
+
+julia&gt; n = e2;  # plane normal (unit for simplicity)
+
+julia&gt; v = e1 + 2e2 + 3e3;
+
+julia&gt; R = exp(π * (n ∧ e3) / 2);  # 180° around axis orthogonal to plane -&gt; reflection
+
+julia&gt; v_ref = R ≀ v; v_ref isa MultiVector; true
+true</code></pre><h2 id="PGA:-intersection-of-two-planes-line"><a class="docs-heading-anchor" href="#PGA:-intersection-of-two-planes-line">PGA: intersection of two planes -&gt; line</a><a id="PGA:-intersection-of-two-planes-line-1"></a><a class="docs-heading-anchor-permalink" href="#PGA:-intersection-of-two-planes-line" title="Permalink"></a></h2><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; pga = CliffordAlgebra(:PGA3D);
+
+julia&gt; e1, e2, e3, e0 = basevector(pga,1), basevector(pga,2), basevector(pga,3), basevector(pga,:e0);
+
+julia&gt; plane_xy = e3;  # z=0 plane
+
+julia&gt; plane_xz = e2;  # y=0 plane
+
+julia&gt; line = plane_xy ∧ plane_xz;
+
+julia&gt; isgrade(line, 2)
+true</code></pre><h2 id="PGA:-reflect-a-vector-in-a-plane"><a class="docs-heading-anchor" href="#PGA:-reflect-a-vector-in-a-plane">PGA: reflect a vector in a plane</a><a id="PGA:-reflect-a-vector-in-a-plane-1"></a><a class="docs-heading-anchor-permalink" href="#PGA:-reflect-a-vector-in-a-plane" title="Permalink"></a></h2><p>Reflect across the plane z=0 (normal e3). The z component flips.</p><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; pga = CliffordAlgebra(:PGA3D);
+
+julia&gt; e1, e2, e3 = basevector(pga,1), basevector(pga,2), basevector(pga,3);
+
+julia&gt; plane = e3;  # z=0
+
+julia&gt; v = e1 + e3;
+
+julia&gt; v_ref = plane ≀ v; true
+true</code></pre><h2 id="PGA:-line-plane-meet-point"><a class="docs-heading-anchor" href="#PGA:-line-plane-meet-point">PGA: line-plane meet -&gt; point</a><a id="PGA:-line-plane-meet-point-1"></a><a class="docs-heading-anchor-permalink" href="#PGA:-line-plane-meet-point" title="Permalink"></a></h2><p>The meet (∨) of a line and a plane yields a point (grade-3 in PGA3D).</p><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; pga = CliffordAlgebra(:PGA3D);
+
+julia&gt; e1, e2, e3 = basevector(pga,1), basevector(pga,2), basevector(pga,3);
+
+julia&gt; plane_xy = e3;      # z=0
+
+julia&gt; plane_xz = e2;      # y=0
+
+julia&gt; line = plane_xy ∧ plane_xz;  # x-axis line
+
+julia&gt; plane_yz = e1;      # x=0
+
+julia&gt; pt = line ∨ plane_yz;
+
+julia&gt; isgrade(pt, 3)
+true</code></pre><h2 id="PGA:-rigid-body-motor-(rotation-translation)"><a class="docs-heading-anchor" href="#PGA:-rigid-body-motor-(rotation-translation)">PGA: rigid-body motor (rotation + translation)</a><a id="PGA:-rigid-body-motor-(rotation-translation)-1"></a><a class="docs-heading-anchor-permalink" href="#PGA:-rigid-body-motor-(rotation-translation)" title="Permalink"></a></h2><p>Compose a small rotation about z with a small translation along x, then apply to a vector.</p><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; pga = CliffordAlgebra(:PGA3D);
+
+julia&gt; e1, e2, e3, e0 = basevector(pga,1), basevector(pga,2), basevector(pga,3), basevector(pga,:e0);
+
+julia&gt; B = (π/12) * (e1 ∧ e2);      # rotate about z
+
+julia&gt; T = 0.05 * (e0 ∧ e1);        # translate along x (translator-like)
+
+julia&gt; M = exp(B + T);
+
+julia&gt; v = e1 + 2e2;  # a direction-grade representative
+
+julia&gt; v2 = M ≀ v; v2 isa MultiVector; true
+true</code></pre><h2 id="Cl3:-compose-two-rotations-via-rotors"><a class="docs-heading-anchor" href="#Cl3:-compose-two-rotations-via-rotors">Cl3: compose two rotations via rotors</a><a id="Cl3:-compose-two-rotations-via-rotors-1"></a><a class="docs-heading-anchor-permalink" href="#Cl3:-compose-two-rotations-via-rotors" title="Permalink"></a></h2><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; cl3 = CliffordAlgebra(3);
+
+julia&gt; e1, e2, e3 = cl3.e1, cl3.e2, cl3.e3;
+
+julia&gt; B1 = (π/6) * (e1 ∧ e2);
+
+julia&gt; B2 = (π/7) * (e2 ∧ e3);
+
+julia&gt; R1, R2 = exp(B1), exp(B2);
+
+julia&gt; v = e1 + 2e2 + 3e3;
+
+julia&gt; v_seq = R2 ≀ (R1 ≀ v);
+
+julia&gt; v_comb = (R2 * R1) ≀ v; true
+true</code></pre><h2 id="STA:-Lorentz-boost-via-bivector-exponential"><a class="docs-heading-anchor" href="#STA:-Lorentz-boost-via-bivector-exponential">STA: Lorentz boost via bivector exponential</a><a id="STA:-Lorentz-boost-via-bivector-exponential-1"></a><a class="docs-heading-anchor-permalink" href="#STA:-Lorentz-boost-via-bivector-exponential" title="Permalink"></a></h2><p>Boost along x with rapidity 0.1 (using generator t∧x). Minkowski norm is preserved.</p><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; sta = CliffordAlgebra(:Spacetime);
+
+julia&gt; t, x = basevector(sta,:t), basevector(sta,:x);
+
+julia&gt; B = 0.1 * (t ∧ x);
+
+julia&gt; R = exp(B);
+
+julia&gt; v = t + 0.5x;  # timelike vector with small spatial part
+
+julia&gt; vb = R ≀ v;    # boosted
+
+julia&gt; s(a) = scalar(a * ~a);
+
+julia&gt; isgrade(vb, 1) &amp;&amp; s(vb) ≈ s(v)
+true</code></pre><h2 id="CGA:-rotate-a-Euclidean-vector-by-a-rotor"><a class="docs-heading-anchor" href="#CGA:-rotate-a-Euclidean-vector-by-a-rotor">CGA: rotate a Euclidean vector by a rotor</a><a id="CGA:-rotate-a-Euclidean-vector-by-a-rotor-1"></a><a class="docs-heading-anchor-permalink" href="#CGA:-rotate-a-Euclidean-vector-by-a-rotor" title="Permalink"></a></h2><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; cga = CliffordAlgebra(:CGA3D);
+
+julia&gt; e1, e2, e3 = basevector(cga,1), basevector(cga,2), basevector(cga,3);
+
+julia&gt; B = (π/6) * (e1 ∧ e2);
+
+julia&gt; R = exp(B);
+
+julia&gt; v = e1 + e2;
+
+julia&gt; v_rot = R ≀ v; v_rot isa MultiVector; true
+true</code></pre><h2 id="CGA:-translate-a-point-using-a-motor-(CGA-screw-motion)"><a class="docs-heading-anchor" href="#CGA:-translate-a-point-using-a-motor-(CGA-screw-motion)">CGA: translate a point using a motor (CGA screw motion)</a><a id="CGA:-translate-a-point-using-a-motor-(CGA-screw-motion)-1"></a><a class="docs-heading-anchor-permalink" href="#CGA:-translate-a-point-using-a-motor-(CGA-screw-motion)" title="Permalink"></a></h2><p>Note: For brevity, we model a simple translation by building a null bivector.</p><pre><code class="language-julia-repl hljs">julia&gt; using CliffordAlgebras
+
+julia&gt; cga = CliffordAlgebra(:CGA3D);
+
+julia&gt; e1, e2, e3 = basevector(cga,1), basevector(cga,2), basevector(cga,3);
+
+julia&gt; eplus, eminus = basevector(cga,:e₊), basevector(cga,:e₋);
+
+julia&gt; ninf = eminus;  # direction to infinity
+
+julia&gt; t = 0.1*(e1) ∧ ninf;  # translator-like bivector
+
+julia&gt; T = exp(t);
+
+julia&gt; p = e1;  # simple direction-grade representative
+
+julia&gt; p2 = T ≀ p; p2 isa MultiVector; true
+true</code></pre><h2 id="Tips"><a class="docs-heading-anchor" href="#Tips">Tips</a><a id="Tips-1"></a><a class="docs-heading-anchor-permalink" href="#Tips" title="Permalink"></a></h2><ul><li>Use <code>matrix(mv)</code> and <code>vector(mv)</code> for sanity checks against linear algebra operations.</li><li>Prefer small angles and normalized elements in doctests to keep outputs stable.</li><li>When doctests are sensitive to printed formatting, write to an IOBuffer and assert <code>true</code>.</li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../algebras/">« Algebra Catalog</a><a class="docs-footer-nextpage" href="../performance/">Performance Guide »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Sunday 21 September 2025 09:24">Sunday 21 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
